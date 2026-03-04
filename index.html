@@ -1,0 +1,3527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Zandy Koufax Combobulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2eb;
+  --surface: #fff;
+  --surface2: #f0ece3;
+  --border: #ddd8cc;
+  --ink: #1a1a14;
+  --muted: #8a8470;
+  --accent: #c8431a;
+  --accent2: #1a6bc8;
+  --green: #2a7a3b;
+  --gold: #b8860b;
+  --red: #c8431a;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  border-bottom: 3px solid var(--accent);
+}
+
+.logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.logo span { color: var(--accent); }
+
+.header-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: #aaa;
+  letter-spacing: 0.1em;
+}
+
+/* ── TABS ── */
+.tabs {
+  background: var(--ink);
+  display: flex;
+  padding: 0 28px;
+  gap: 2px;
+  border-bottom: 1px solid #333;
+}
+
+.tab-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover { color: #ccc; }
+.tab-btn.active { color: var(--bg); border-bottom-color: var(--accent); }
+
+/* ── PANELS ── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── IMPORT PANEL ── */
+.import-panel {
+  padding: 28px;
+  max-width: 1100px;
+}
+
+.section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.import-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.import-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.import-card-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.source-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-fp { background: #e85c30; }
+.dot-fg { background: #6001d2; }
+.dot-espn { background: #cc0000; }
+
+label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+  margin-top: 12px;
+}
+
+label:first-of-type { margin-top: 0; }
+
+textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+  min-height: 120px;
+  transition: border-color 0.15s;
+}
+
+textarea:focus { border-color: var(--accent2); }
+
+input[type="text"], input[type="number"] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+input[type="text"]:focus, input[type="number"]:focus { border-color: var(--accent2); }
+
+select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  color: var(--ink);
+  outline: none;
+}
+
+.btn {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn:hover { opacity: 0.85; }
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--accent); color: white; }
+.btn-secondary { background: var(--ink); color: var(--bg); }
+.btn-sm { padding: 6px 14px; font-size: 0.78rem; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--ink); }
+
+.paste-help {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.paste-help code {
+  background: var(--surface2);
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+}
+
+/* Sample data button */
+.sample-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 3px;
+  padding: 5px 10px;
+  color: var(--muted);
+  cursor: pointer;
+  margin-top: 8px;
+  width: 100%;
+  transition: all 0.15s;
+}
+.sample-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+.import-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.import-status {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--green);
+  letter-spacing: 0.06em;
+}
+
+/* ── RANKINGS PANEL ── */
+.rankings-panel {
+  padding: 20px 28px;
+}
+
+.rankings-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+}
+
+.search-wrap input {
+  padding-left: 32px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.pos-filter {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pos-pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+
+.pos-pill:hover, .pos-pill.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.show-available {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.toggle {
+  width: 32px; height: 18px;
+  background: var(--border);
+  border-radius: 9px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggle.on { background: var(--green); }
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: white;
+  top: 2px; left: 2px;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle.on::after { left: 16px; }
+
+/* Rankings table */
+.rankings-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 14px;
+  text-align: left;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+th:hover { color: var(--ink); }
+th.sorted { color: var(--accent); }
+
+td {
+  padding: 9px 14px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f0ece3;
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr.taken { opacity: 0.38; }
+tr.taken td { background: repeating-linear-gradient(
+  135deg, transparent, transparent 4px, rgba(0,0,0,0.015) 4px, rgba(0,0,0,0.015) 8px
+); }
+
+tr:hover:not(.taken) td { background: rgba(200, 67, 26, 0.03); }
+
+.player-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.player-team {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-left: 6px;
+}
+
+.pos-badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-weight: 500;
+  min-width: 28px;
+  text-align: center;
+}
+
+.pos-C { background: #e3f0f5; color: #1a5a7a; }
+.pos-1B { background: #fdf0e0; color: #8a4a00; }
+.pos-2B { background: #fdf0e0; color: #8a4a00; }
+.pos-3B { background: #fdf0e0; color: #8a4a00; }
+.pos-SS { background: #fdf0e0; color: #8a4a00; }
+.pos-OF { background: #e8f5e0; color: #2a6a1a; }
+.pos-SP { background: #f0e8f5; color: #5a1a7a; }
+.pos-RP { background: #f5e8f0; color: #7a1a5a; }
+
+.rank-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 28px;
+  display: inline-block;
+}
+
+.rank-cell {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.median-cell {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.median-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.median-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--accent);
+  min-width: 2px;
+  transition: width 0.3s;
+}
+
+.taken-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.draft-quick-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+tr:hover .draft-quick-btn { opacity: 1; }
+
+/* ── DRAFT BOARD PANEL ── */
+.draft-panel {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  height: calc(100vh - 107px);
+  overflow: hidden;
+}
+
+/* Left: available players */
+.available-col {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.col-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.col-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.available-search {
+  position: relative;
+}
+
+.available-search input {
+  padding: 7px 10px 7px 30px;
+  font-size: 0.82rem;
+}
+
+.available-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.available-list::-webkit-scrollbar { width: 4px; }
+.available-list::-webkit-scrollbar-track { background: transparent; }
+.available-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.avail-pos-group { margin-bottom: 12px; }
+
+.avail-pos-header {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 8px;
+  margin-bottom: 4px;
+}
+
+.player-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  cursor: grab;
+  transition: all 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.player-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 6px rgba(200,67,26,0.15);
+  transform: translateY(-1px);
+}
+
+.player-card.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.player-card-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pc-rank {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  min-width: 22px;
+}
+
+.pc-name {
+  font-weight: 500;
+  font-size: 0.83rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pc-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.pc-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pc-score {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* Right: team boards */
+.teams-col {
+  overflow: auto;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.teams-col::-webkit-scrollbar { width: 6px; height: 6px; }
+.teams-col::-webkit-scrollbar-track { background: transparent; }
+.teams-col::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.draft-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.draft-toolbar select {
+  width: auto;
+  font-size: 0.82rem;
+  padding: 6px 10px;
+}
+
+.on-clock {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: var(--accent);
+  color: white;
+  border-radius: 3px;
+  animation: pulse-border 1.5s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200,67,26,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(200,67,26,0); }
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.team-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s;
+}
+
+.team-card.drop-target {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 2px rgba(26,107,200,0.2);
+}
+
+.team-card.on-clock-team {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(200,67,26,0.25);
+}
+
+.team-header {
+  padding: 8px 10px;
+  background: var(--ink);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.team-name-input {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: var(--bg);
+  outline: none;
+  width: 100%;
+  cursor: text;
+}
+
+.team-name-input::placeholder { color: #666; }
+
+.team-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: #aaa;
+  white-space: nowrap;
+  margin-left: 6px;
+}
+
+.team-roster {
+  min-height: 80px;
+  padding: 6px;
+}
+
+.team-drop-zone {
+  min-height: 50px;
+  border: 2px dashed transparent;
+  border-radius: 3px;
+  transition: all 0.15s;
+  padding: 4px;
+}
+
+.team-drop-zone.drag-over {
+  border-color: var(--accent2);
+  background: rgba(26,107,200,0.04);
+}
+
+.roster-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  border-radius: 2px;
+  margin-bottom: 2px;
+  font-size: 0.78rem;
+  transition: background 0.1s;
+}
+
+.roster-slot:hover { background: var(--surface2); }
+
+.rs-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rs-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+.rs-pos { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+
+.rs-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.1s;
+  flex-shrink: 0;
+}
+
+.roster-slot:hover .rs-remove { opacity: 1; }
+.rs-remove:hover { color: var(--accent); background: rgba(200,67,26,0.08); }
+
+.keeper-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 10px;
+  background: rgba(184,134,11,0.15);
+  color: var(--gold);
+  border: 1px solid rgba(184,134,11,0.3);
+  flex-shrink: 0;
+}
+
+.rs-rank {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.empty-drop {
+  text-align: center;
+  padding: 16px 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--border);
+  text-transform: uppercase;
+}
+
+/* Keeper section divider */
+.roster-divider {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 6px 2px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+/* ── BEST AVAIL PANEL ── */
+.bestavail-panel {
+  padding: 20px 28px;
+}
+
+.ba-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ba-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.ba-card-header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 8px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ba-player {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+  cursor: pointer;
+}
+
+.ba-player:last-child { border-bottom: none; }
+.ba-player:hover { background: var(--surface2); }
+
+.ba-rank-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-right: 10px;
+  min-width: 20px;
+}
+
+.ba-name { font-weight: 500; font-size: 0.88rem; }
+.ba-score {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── DRAG GHOST ── */
+#drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transition: opacity 0.1s;
+  white-space: nowrap;
+}
+
+/* ── NOTIFICATIONS ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  box-shadow: var(--shadow-lg);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.2s;
+  border-left: 3px solid var(--accent);
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* Scrollbar for available list */
+.available-list { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.anim-in { animation: slideIn 0.2s ease forwards; }
+
+.sort-arrow { font-size: 0.6rem; margin-left: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">The Zandy Koufax <span>Combobulator</span></div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="header-meta">10 TEAMS · SNAKE DRAFT · 2025</div>
+    <div style="width:1px;height:20px;background:#444;margin:0 4px;"></div>
+    <button onclick="exportData()" style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid #555;border-radius:3px;color:#ccc;padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#c8f135';this.style.color='#c8f135'" onmouseout="this.style.borderColor='#555';this.style.color='#ccc'">↓ Save</button>
+    <label style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid #555;border-radius:3px;color:#ccc;padding:5px 12px;cursor:pointer;transition:all 0.15s;margin:0;" onmouseover="this.style.borderColor='#1a6bc8';this.style.color='#6aabf8'" onmouseout="this.style.borderColor='#555';this.style.color='#ccc'">↑ Load<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('import', this)">① Import Rankings</button>
+  <button class="tab-btn" onclick="switchTab('rankings', this)">② Rankings</button>
+  <button class="tab-btn" onclick="switchTab('draft', this)">③ Draft Board</button>
+  <button class="tab-btn" onclick="switchTab('bestavail', this)">④ Best Available</button>
+  <button class="tab-btn" onclick="switchTab('prospects', this)">⑤ Top Prospects</button>
+  <button class="tab-btn" onclick="switchTab('teams', this)">⑥ Team Rosters</button>
+  <button class="tab-btn" onclick="switchTab('picks', this)">⑦ Draft Picks</button>
+  <button class="tab-btn" onclick="switchTab('watchlist', this)">⑧ Watchlist</button>
+  <button class="tab-btn" onclick="switchTab('catrating', this)">⑨ Cat. Strength</button>
+</div>
+
+<!-- ══════════ IMPORT TAB ══════════ -->
+<div id="panel-import" class="panel active">
+<div class="import-panel">
+
+  <div class="section-title">Paste Rankings</div>
+  <p style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;line-height:1.6;">
+    Paste player rankings from each site below. Format: one player per line as <code style="background:var(--surface2);padding:1px 5px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;">Rank. Player Name, POS, TEAM</code> or just player names in order.
+    Rankings will be merged and a consensus score calculated.
+  </p>
+
+  <div class="import-grid">
+    <div class="import-card">
+      <div class="import-card-title"><span class="source-dot dot-fp"></span> FantasyPros</div>
+      <label>Upload CSV</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='#e85c30';this.style.color='#e85c30'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        📄 Choose CSV file…
+        <input type="file" accept=".csv" style="display:none" onchange="loadCSV(event,'fp')">
+      </label>
+      <div id="fp-csv-status" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+      <label>— or paste manually —</label>
+      <textarea id="fp-input" placeholder="1. Juan Soto, OF, NYY&#10;2. Ronald Acuña Jr., OF, ATL&#10;3. Mookie Betts, OF/2B, LAD&#10;..."></textarea>
+      <p class="paste-help">fantasypros.com → Dynasty Rankings → Export CSV, or copy-paste the list</p>
+      <button class="sample-btn" onclick="loadSample('fp')">↓ Load sample data</button>
+    </div>
+
+    <div class="import-card">
+      <div class="import-card-title"><span class="source-dot dot-fg"></span> Yahoo</div>
+      <label>Upload CSV</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='#2e7d32';this.style.color='#2e7d32'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        📄 Choose CSV file…
+        <input type="file" accept=".csv" style="display:none" onchange="loadCSV(event,'fg')">
+      </label>
+      <div id="fg-csv-status" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+      <label>— or paste manually —</label>
+      <textarea id="fg-input" placeholder="1. Ronald Acuña Jr., OF, ATL&#10;2. Juan Soto, OF, NYY&#10;3. Julio Rodríguez, OF, SEA&#10;..."></textarea>
+      <p class="paste-help">sports.yahoo.com/fantasy → Dynasty Rankings → Export/copy list</p>
+      <button class="sample-btn" onclick="loadSample('fg')">↓ Load sample data</button>
+    </div>
+
+    <div class="import-card">
+      <div class="import-card-title"><span class="source-dot dot-espn"></span> ESPN</div>
+      <label>Upload CSV</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='#cc0000';this.style.color='#cc0000'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        📄 Choose CSV file…
+        <input type="file" accept=".csv" style="display:none" onchange="loadCSV(event,'espn')">
+      </label>
+      <div id="espn-csv-status" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+      <label>— or paste manually —</label>
+      <textarea id="espn-input" placeholder="1. Mookie Betts, OF/2B, LAD&#10;2. Juan Soto, OF, NYY&#10;3. Ronald Acuña Jr., OF, ATL&#10;..."></textarea>
+      <p class="paste-help">ESPN Fantasy → Baseball → Player Rater → Export or copy</p>
+      <button class="sample-btn" onclick="loadSample('espn')">↓ Load sample data</button>
+    </div>
+  </div>
+
+  <div class="import-actions">
+    <button class="btn btn-primary" onclick="processImport()">Process Rankings →</button>
+    <button class="btn btn-secondary" onclick="loadAllSamples()">Load All Sample Data</button>
+    <span class="import-status" id="import-status"></span>
+  </div>
+
+  <div style="margin-top:32px;">
+    <div class="section-title">Import Projected Stats <span style="font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:0.7rem;color:var(--muted);letter-spacing:0.08em;">(from Yahoo Steamer/ZiPS)</span></div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+      Export projections from sports.yahoo.com/fantasy/projections → Steamer projections → Export. Batters and pitchers can be uploaded separately. Columns auto-detected.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:700px;">
+      <div class="import-card">
+        <div class="import-card-title"><span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#c8102e;color:white;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:0;margin-right:4px;flex-shrink:0;">11</span> Batter Projections <span style="font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:0.6rem;color:var(--muted);margin-left:4px;">J.Ramírez</span></div>
+        <label>Upload Yahoo CSV</label>
+        <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+          📄 Choose CSV…
+          <input type="file" accept=".csv" style="display:none" onchange="loadProjCSV(event,'bat')">
+        </label>
+        <div id="proj-bat-status" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+        <p class="paste-help">Columns used: Name, R, HR, RBI, SB, AVG</p>
+      </div>
+      <div class="import-card">
+        <div class="import-card-title">⚾ Pitcher Projections</div>
+        <label>Upload Yahoo CSV</label>
+        <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+          📄 Choose CSV…
+          <input type="file" accept=".csv" style="display:none" onchange="loadProjCSV(event,'pit')">
+        </label>
+        <div id="proj-pit-status" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+        <p class="paste-help">Columns used: Name, W, SO, ERA, WHIP, SV+HLD</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;">
+    <div class="section-title">Team Names</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:4px;" id="team-names-grid"></div>
+  </div>
+
+  <div style="margin-top:32px;">
+    <div class="section-title">Import Keepers</div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+      Upload a CSV with keeper assignments. Required columns: <code style="background:var(--surface2);padding:1px 5px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;">Player, Team</code>. Optional: <code style="background:var(--surface2);padding:1px 5px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;">Position</code>. Players will be marked as keepers and removed from the draft board automatically.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:800px;">
+      <div class="import-card">
+        <div class="import-card-title">📋 Keeper CSV Upload</div>
+        <label>Upload CSV</label>
+        <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border:2px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+          📄 Choose keeper CSV file…
+          <input type="file" accept=".csv" style="display:none" onchange="loadKeeperCSV(event)">
+        </label>
+        <div id="keeper-csv-status" style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--green);margin-top:6px;min-height:18px;"></div>
+        <p class="paste-help" style="margin-top:8px;">CSV format: <code>Player,Team,Position</code><br>Team name must match your team names above (or use Team 1, Team 2…)</p>
+      </div>
+      <div class="import-card">
+        <div class="import-card-title">📝 Or Paste Keepers</div>
+        <label>One per line: Player Name, Team Name</label>
+        <textarea id="keeper-paste" rows="7" placeholder="Juan Soto, Team 1&#10;Ronald Acuña Jr., Team 2&#10;Bobby Witt Jr., Team 3&#10;..."></textarea>
+        <button class="btn btn-primary" style="margin-top:10px;width:100%;font-size:0.82rem;padding:8px;" onclick="processKeeperPaste()">Assign Keepers →</button>
+      </div>
+    </div>
+    <div id="keeper-preview" style="margin-top:16px;display:none;">
+      <div class="section-title" style="font-size:0.9rem;">Keeper Assignments Preview</div>
+      <div id="keeper-preview-inner" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px;"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════ RANKINGS TAB ══════════ -->
+<div id="panel-rankings" class="panel">
+<div class="rankings-panel">
+  <div class="rankings-toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="rank-search" placeholder="Search players…" oninput="renderRankings()">
+    </div>
+    <div class="pos-filter" id="pos-filter"></div>
+    <label class="show-available" onclick="toggleAvailOnly()">
+      <div class="toggle" id="avail-toggle"></div>
+      Available only
+    </label>
+    <label class="show-available" onclick="toggleStats()" style="margin-left:8px;">
+      <div class="toggle" id="stats-toggle"></div>
+      Show projections
+    </label>
+  </div>
+  <div class="rankings-table-wrap">
+    <table>
+      <thead>
+        <tr id="rankings-thead-row">
+          <th onclick="sortBy('medianRank')">#<span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('name')">Player<span class="sort-arrow">↕</span></th>
+          <th>Pos</th>
+          <th onclick="sortBy('fp')" title="FantasyPros">FP<span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('fg')" title="Yahoo">YHspan class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('espn')" title="ESPN">ESPN<span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('medianRank')">Median<span class="sort-arrow">↕</span></th>
+          <th>Status</th>
+          <th>Note</th>
+          <th></th>
+          <th title="Watchlist">☆</th>
+        </tr>
+      </thead>
+      <tbody id="rankings-tbody"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ DRAFT BOARD TAB ══════════ -->
+<div id="panel-draft" class="panel">
+  <div class="draft-panel">
+
+    <!-- LEFT: Available players -->
+    <div class="available-col">
+      <div class="col-header">
+        <div class="col-title">Available Players</div>
+        <div class="available-search">
+          <span class="search-icon" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted)">⌕</span>
+          <input type="text" id="avail-search" placeholder="Search…" oninput="renderAvailable()" style="padding-left:30px">
+        </div>
+        <div class="pos-filter" id="draft-pos-filter" style="margin-top:8px;"></div>
+      </div>
+      <div class="available-list" id="available-list"></div>
+    </div>
+
+    <!-- RIGHT: Teams -->
+    <div class="teams-col">
+      <div class="draft-toolbar">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.06em;text-transform:uppercase;">On the clock:</span>
+        <select id="clock-team" onchange="updateClock()">
+          <option value="">— select team —</option>
+        </select>
+        <div class="on-clock" id="clock-display" style="display:none"></div>
+        <button class="btn btn-sm btn-ghost" onclick="advancePick()">Next pick →</button>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);margin-left:auto;" id="pick-counter"></span>
+      </div>
+      <!-- Needs analysis bar -->
+      <div id="needs-bar" style="display:none;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-right:4px;">Needs:</span>
+        <div id="needs-pills" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="teams-grid" id="teams-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ BEST AVAILABLE TAB ══════════ -->
+<div id="panel-bestavail" class="panel">
+<div class="bestavail-panel">
+  <div class="section-title">Best Available by Position</div>
+  <div class="ba-grid" id="ba-grid"></div>
+  <div class="section-title" style="margin-top:8px;">Top 20 Overall Available</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:700px;box-shadow:var(--shadow)">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Player</th><th>Pos</th><th>Median Rank</th><th>FP</th><th>FG</th><th>ESPN</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="ba-overall-tbody"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PROSPECTS TAB ══════════ -->
+<div id="panel-prospects" class="panel">
+<div class="import-panel" style="max-width:100%">
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+
+    <!-- LEFT: Import -->
+    <div>
+      <div class="section-title">Import Prospect Rankings</div>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+        Import from up to 3 sources — Baseball America, MLB Pipeline, Yahoo, etc. Rankings will be merged into a consensus prospect score separate from your main player pool.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Source 1 -->
+        <div class="import-card">
+          <div class="import-card-title"><span class="source-dot" style="background:#1a6bc8"></span> Source 1</div>
+          <input type="text" id="pros-src1-name" placeholder="e.g. Baseball America" style="margin-bottom:10px">
+          <label>Upload CSV</label>
+          <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='#1a6bc8';this.style.color='#1a6bc8'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+            📄 Choose CSV file…
+            <input type="file" accept=".csv" style="display:none" onchange="loadProspectCSV(event,0)">
+          </label>
+          <div id="pros-csv-status-0" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+          <label>— or paste manually —</label>
+          <textarea id="pros-input-0" rows="5" placeholder="1. Wyatt Langford, OF, TEX&#10;2. Jackson Holliday, SS, BAL&#10;3. Evan Carter, OF, TEX&#10;..."></textarea>
+        </div>
+
+        <!-- Source 2 -->
+        <div class="import-card">
+          <div class="import-card-title"><span class="source-dot" style="background:#2e7d32"></span> Source 2</div>
+          <input type="text" id="pros-src2-name" placeholder="e.g. MLB Pipeline" style="margin-bottom:10px">
+          <label>Upload CSV</label>
+          <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='#2e7d32';this.style.color='#2e7d32'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+            📄 Choose CSV file…
+            <input type="file" accept=".csv" style="display:none" onchange="loadProspectCSV(event,1)">
+          </label>
+          <div id="pros-csv-status-1" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+          <label>— or paste manually —</label>
+          <textarea id="pros-input-1" rows="5" placeholder="1. Jackson Holliday, SS, BAL&#10;2. Wyatt Langford, OF, TEX&#10;3. Dylan Crews, OF, WSH&#10;..."></textarea>
+        </div>
+
+        <!-- Source 3 -->
+        <div class="import-card">
+          <div class="import-card-title"><span class="source-dot" style="background:#b8860b"></span> Source 3</div>
+          <input type="text" id="pros-src3-name" placeholder="e.g. Yahoo" style="margin-bottom:10px">
+          <label>Upload CSV</label>
+          <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-top:0;text-transform:none;" onmouseover="this.style.borderColor='#b8860b';this.style.color='#b8860b'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+            📄 Choose CSV file…
+            <input type="file" accept=".csv" style="display:none" onchange="loadProspectCSV(event,2)">
+          </label>
+          <div id="pros-csv-status-2" style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--green);margin-top:4px;min-height:16px;"></div>
+          <label>— or paste manually —</label>
+          <textarea id="pros-input-2" rows="5" placeholder="1. Dylan Crews, OF, WSH&#10;2. Wyatt Langford, OF, TEX&#10;3. Jackson Holliday, SS, BAL&#10;..."></textarea>
+        </div>
+
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:16px;align-items:center;">
+        <button class="btn btn-primary" onclick="processProspects()">Process Prospects →</button>
+        <button class="btn btn-secondary" onclick="loadSampleProspects()">Load Sample Data</button>
+        <span id="pros-status" style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--green);letter-spacing:0.06em;"></span>
+      </div>
+    </div>
+
+    <!-- RIGHT: Prospect board -->
+    <div>
+      <div class="section-title">Prospect Board</div>
+
+      <!-- Toolbar -->
+      <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+        <div class="search-wrap" style="max-width:240px;">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="pros-search" placeholder="Search prospects…" oninput="renderProspects()">
+        </div>
+        <div class="pos-filter" id="pros-pos-filter"></div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);">
+        <table style="width:100%">
+          <thead>
+            <tr>
+              <th onclick="sortProspectsBy('medianRank')" style="cursor:pointer"># <span class="sort-arrow">↕</span></th>
+              <th>Prospect</th>
+              <th>Pos</th>
+              <th>Org</th>
+              <th id="pros-th-0" style="cursor:pointer" onclick="sortProspectsBy('s0')">— <span class="sort-arrow">↕</span></th>
+              <th id="pros-th-1" style="cursor:pointer" onclick="sortProspectsBy('s1')">— <span class="sort-arrow">↕</span></th>
+              <th id="pros-th-2" style="cursor:pointer" onclick="sortProspectsBy('s2')">— <span class="sort-arrow">↕</span></th>
+              <th onclick="sortProspectsBy('medianRank')" style="cursor:pointer">Median <span class="sort-arrow">↕</span></th>
+              <th>ETA</th>
+            </tr>
+          </thead>
+          <tbody id="pros-tbody">
+            <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.75rem;">Import prospect rankings to get started.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════ TEAM ROSTERS TAB ══════════ -->
+<div id="panel-teams" class="panel">
+<div style="padding:20px 28px;">
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
+    <div class="section-title" style="margin-bottom:0;flex:1;">Team Roster Fills</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);">Primary position only · League: C, 1B, 2B, 3B, SS, OF×3, UTIL, SP×3, RP, P×2, BN×10, IL×3</div>
+  </div>
+  <div id="team-roster-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;"></div>
+</div>
+</div>
+
+<!-- ══════════ DRAFT PICKS TAB ══════════ -->
+<div id="panel-picks" class="panel">
+<div style="padding:20px 28px;max-width:1100px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+    <!-- Add pick form -->
+    <div>
+      <div class="section-title">Add / Trade Pick</div>
+      <div class="import-card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label>Round</label>
+            <select id="pk-round">
+              <option>1</option><option>2</option><option>3</option><option>4</option>
+              <option>5</option><option>6</option><option>7</option><option>8</option>
+              <option>9</option><option>10</option>
+            </select>
+          </div>
+          <div>
+            <label>Year</label>
+            <select id="pk-year">
+              <option>2025</option><option>2026</option><option>2027</option><option>2028</option>
+            </select>
+          </div>
+          <div>
+            <label>Originally Owned By</label>
+            <select id="pk-from"></select>
+          </div>
+          <div>
+            <label>Currently Owned By</label>
+            <select id="pk-to"></select>
+          </div>
+        </div>
+        <label>Note (optional)</label>
+        <input type="text" id="pk-note" placeholder="e.g. traded for Soto deal">
+        <button class="btn btn-primary" style="margin-top:12px;width:100%;" onclick="addPick()">Add Pick</button>
+      </div>
+    </div>
+
+    <!-- Pick board -->
+    <div>
+      <div class="section-title">Pick Board</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;" id="picks-team-filter"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;" id="picks-board"></div>
+</div>
+</div>
+
+<!-- ══════════ WATCHLIST TAB ══════════ -->
+<div id="panel-watchlist" class="panel">
+<div style="padding:20px 28px;">
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
+    <div class="section-title" style="margin-bottom:0;flex:1;">Watchlist</div>
+    <div class="search-wrap" style="max-width:260px;">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="wl-search" placeholder="Add player to watchlist…" oninput="renderWatchlistSearch()">
+    </div>
+  </div>
+
+  <!-- Search results dropdown -->
+  <div id="wl-search-results" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;max-height:200px;overflow-y:auto;margin-bottom:16px;display:none;box-shadow:var(--shadow);max-width:400px;"></div>
+
+  <!-- Priority groups -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;" id="wl-columns">
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.1em;text-transform:uppercase;padding:8px 12px;background:#c8431a;color:white;border-radius:4px 4px 0 0;">🔥 Must Draft</div>
+      <div id="wl-high" class="wl-col" data-priority="high" style="min-height:120px;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:6px;"></div>
+    </div>
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.1em;text-transform:uppercase;padding:8px 12px;background:#b8860b;color:white;border-radius:4px 4px 0 0;">👀 Targeting</div>
+      <div id="wl-mid" class="wl-col" data-priority="mid" style="min-height:120px;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:6px;"></div>
+    </div>
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.1em;text-transform:uppercase;padding:8px 12px;background:#555;color:white;border-radius:4px 4px 0 0;">🕐 Late Round</div>
+      <div id="wl-low" class="wl-col" data-priority="low" style="min-height:120px;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:6px;"></div>
+    </div>
+  </div>
+
+  <p style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);margin-top:12px;letter-spacing:0.06em;">
+    SEARCH TO ADD · CLICK PLAYER TO MOVE BETWEEN TIERS · ✕ TO REMOVE · DRAFTED PLAYERS DIM AUTOMATICALLY
+  </p>
+</div>
+</div>
+
+<!-- ══════════ CATEGORY STRENGTH TAB ══════════ -->
+<div id="panel-catrating" class="panel">
+<div style="padding:20px 28px;">
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:6px;flex-wrap:wrap;">
+    <div class="section-title" style="margin-bottom:0;flex:1;">Category Strength Rating</div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);">Requires projected stats — import from Yahoo on the Import tab</span>
+  </div>
+  <p style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;line-height:1.6;">Based on each team's current roster. Scores are relative — 100 = league best, 0 = league worst for that category.</p>
+
+  <div id="catrating-no-stats" style="display:none;text-align:center;padding:48px;font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--muted);">
+    No projected stats loaded yet.<br>Import a Steamer/ZiPS CSV on the Import tab first.
+  </div>
+
+  <!-- Batter cats -->
+  <div id="catrating-content" style="display:none;">
+    <div class="section-title" style="font-size:0.9rem;margin-bottom:12px;">⚡ Batting Categories</div>
+    <div style="overflow-x:auto;margin-bottom:28px;">
+      <table style="width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);">
+        <thead><tr id="cat-bat-header"></tr></thead>
+        <tbody id="cat-bat-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="font-size:0.9rem;margin-bottom:12px;">⚾ Pitching Categories</div>
+    <div style="overflow-x:auto;margin-bottom:28px;">
+      <table style="width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);">
+        <thead><tr id="cat-pit-header"></tr></thead>
+        <tbody id="cat-pit-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="font-size:0.9rem;margin-bottom:12px;">🏆 Overall Category Score</div>
+    <div id="cat-overall" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;"></div>
+  </div>
+</div>
+</div>
+
+<!-- Drag ghost -->
+<div id="drag-ghost"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const NUM_TEAMS = 10;
+let players = [];       // { id, name, pos, team_abbr, fp, fg, espn, medianRank, takenBy, isKeeper }
+let teams = [];         // { id, name, roster: [playerId,...] }
+let projStats = {};     // { normName: { R, HR, RBI, SB, AVG, W, K, ERA, WHIP, SVH } }
+let playerNotes = {};   // { normName: string }
+let draftPicks = [];    // { teamId, round, pick, fromTeamId, note }
+let showStats = false;
+let sortKey = 'medianRank';
+let sortDir = 1;
+let posFilter = 'ALL';
+let availOnly = false;
+let draftPosFilter = 'ALL';
+let pickOrder = [];     // snake order of team indices
+let currentPickIdx = 0;
+let dragPlayerId = null;
+
+// Init teams
+for (let i = 0; i < NUM_TEAMS; i++) {
+  teams.push({ id: i, name: `Team ${i + 1}`, roster: [] });
+}
+
+// Build snake pick order (10 teams, 25 rounds = 250 picks)
+for (let round = 0; round < 25; round++) {
+  const order = round % 2 === 0
+    ? Array.from({length: NUM_TEAMS}, (_, i) => i)
+    : Array.from({length: NUM_TEAMS}, (_, i) => NUM_TEAMS - 1 - i);
+  pickOrder.push(...order);
+}
+
+// ══════════════════════════════════════════════
+// SAMPLE DATA
+// ══════════════════════════════════════════════
+const SAMPLE_PLAYERS = [
+  { name: "Ronald Acuña Jr.", pos: "OF", team_abbr: "ATL", fp: 1, fg: 2, espn: 3 },
+  { name: "Juan Soto", pos: "OF", team_abbr: "NYY", fp: 2, fg: 1, espn: 2 },
+  { name: "Julio Rodríguez", pos: "OF", team_abbr: "SEA", fp: 3, fg: 3, espn: 5 },
+  { name: "Mookie Betts", pos: "OF/2B", team_abbr: "LAD", fp: 4, fg: 5, espn: 1 },
+  { name: "Bobby Witt Jr.", pos: "SS", team_abbr: "KC", fp: 5, fg: 4, espn: 4 },
+  { name: "Corey Seager", pos: "SS", team_abbr: "TEX", fp: 6, fg: 7, espn: 8 },
+  { name: "Freddie Freeman", pos: "1B", team_abbr: "LAD", fp: 7, fg: 8, espn: 6 },
+  { name: "Yordan Alvarez", pos: "OF/DH", team_abbr: "HOU", fp: 8, fg: 6, espn: 7 },
+  { name: "Trea Turner", pos: "SS", team_abbr: "PHI", fp: 9, fg: 10, espn: 9 },
+  { name: "José Ramírez", pos: "3B", team_abbr: "CLE", fp: 10, fg: 9, espn: 10 },
+  { name: "Wander Franco", pos: "SS", team_abbr: "TB", fp: 11, fg: 12, espn: 15 },
+  { name: "Gunnar Henderson", pos: "SS/3B", team_abbr: "BAL", fp: 12, fg: 11, espn: 11 },
+  { name: "Elly De La Cruz", pos: "SS/3B", team_abbr: "CIN", fp: 13, fg: 13, espn: 12 },
+  { name: "Jackson Holliday", pos: "2B/SS", team_abbr: "BAL", fp: 14, fg: 14, espn: 16 },
+  { name: "Spencer Strider", pos: "SP", team_abbr: "ATL", fp: 15, fg: 17, espn: 13 },
+  { name: "Paul Skenes", pos: "SP", team_abbr: "PIT", fp: 16, fg: 15, espn: 14 },
+  { name: "Colt Keith", pos: "2B/3B", team_abbr: "DET", fp: 17, fg: 18, espn: 20 },
+  { name: "Corbin Carroll", pos: "OF", team_abbr: "ARI", fp: 18, fg: 16, espn: 18 },
+  { name: "Jackson Chourio", pos: "OF", team_abbr: "MIL", fp: 19, fg: 19, espn: 19 },
+  { name: "Adley Rutschman", pos: "C", team_abbr: "BAL", fp: 20, fg: 21, espn: 17 },
+  { name: "Francisco Lindor", pos: "SS", team_abbr: "NYM", fp: 21, fg: 23, espn: 22 },
+  { name: "Shohei Ohtani", pos: "OF/DH", team_abbr: "LAD", fp: 22, fg: 20, espn: 21 },
+  { name: "Zack Wheeler", pos: "SP", team_abbr: "PHI", fp: 23, fg: 24, espn: 25 },
+  { name: "Tyler Glasnow", pos: "SP", team_abbr: "LAD", fp: 24, fg: 22, espn: 23 },
+  { name: "Jazz Chisholm Jr.", pos: "2B/OF", team_abbr: "NYY", fp: 25, fg: 26, espn: 24 },
+  { name: "Kyle Tucker", pos: "OF", team_abbr: "CHC", fp: 26, fg: 25, espn: 27 },
+  { name: "Evan Carter", pos: "OF", team_abbr: "TEX", fp: 27, fg: 28, espn: 28 },
+  { name: "Pete Crow-Armstrong", pos: "OF", team_abbr: "CHC", fp: 28, fg: 27, espn: 30 },
+  { name: "Garrett Crochet", pos: "SP", team_abbr: "BOS", fp: 29, fg: 30, espn: 26 },
+  { name: "Vladimir Guerrero Jr.", pos: "1B", team_abbr: "TOR", fp: 30, fg: 29, espn: 29 },
+  { name: "CJ Abrams", pos: "SS", team_abbr: "WSH", fp: 31, fg: 33, espn: 32 },
+  { name: "Matt McLain", pos: "SS/2B", team_abbr: "CIN", fp: 32, fg: 31, espn: 33 },
+  { name: "Cole Ragans", pos: "SP", team_abbr: "KC", fp: 33, fg: 32, espn: 35 },
+  { name: "Michael Harris II", pos: "OF", team_abbr: "ATL", fp: 34, fg: 35, espn: 31 },
+  { name: "Ke'Bryan Hayes", pos: "3B", team_abbr: "PIT", fp: 35, fg: 34, espn: 36 },
+  { name: "Nolan Arenado", pos: "3B", team_abbr: "STL", fp: 36, fg: 38, espn: 34 },
+  { name: "Eury Pérez", pos: "SP", team_abbr: "MIA", fp: 37, fg: 36, espn: 40 },
+  { name: "Tarik Skubal", pos: "SP", team_abbr: "DET", fp: 38, fg: 37, espn: 38 },
+  { name: "Jake Burger", pos: "3B/1B", team_abbr: "MIA", fp: 39, fg: 40, espn: 37 },
+  { name: "Wilyer Abreu", pos: "OF", team_abbr: "BOS", fp: 40, fg: 39, espn: 42 },
+  { name: "Jonah Heim", pos: "C", team_abbr: "TEX", fp: 41, fg: 43, espn: 39 },
+  { name: "Christian Yelich", pos: "OF", team_abbr: "MIL", fp: 42, fg: 42, espn: 41 },
+  { name: "Zach Neto", pos: "SS", team_abbr: "LAA", fp: 43, fg: 41, espn: 45 },
+  { name: "Sean Manaea", pos: "SP", team_abbr: "NYM", fp: 44, fg: 46, espn: 43 },
+  { name: "Max Fried", pos: "SP", team_abbr: "NYY", fp: 45, fg: 44, espn: 44 },
+  { name: "Walker Buehler", pos: "SP", team_abbr: "BOS", fp: 46, fg: 45, espn: 47 },
+  { name: "Masyn Winn", pos: "SS", team_abbr: "STL", fp: 47, fg: 48, espn: 46 },
+  { name: "Xander Bogaerts", pos: "SS", team_abbr: "SD", fp: 48, fg: 47, espn: 50 },
+  { name: "Luis Arraez", pos: "2B/1B", team_abbr: "SD", fp: 49, fg: 50, espn: 48 },
+  { name: "Bryce Harper", pos: "1B/OF", team_abbr: "PHI", fp: 50, fg: 49, espn: 49 },
+  { name: "Dylan Cease", pos: "SP", team_abbr: "SD", fp: 51, fg: 52, espn: 51 },
+  { name: "George Kirby", pos: "SP", team_abbr: "SEA", fp: 52, fg: 51, espn: 53 },
+  { name: "Cade Horton", pos: "SP", team_abbr: "CHC", fp: 53, fg: 53, espn: 55 },
+  { name: "Endy Rodríguez", pos: "C/OF", team_abbr: "PIT", fp: 54, fg: 55, espn: 52 },
+  { name: "Carlos Correa", pos: "SS", team_abbr: "MIN", fp: 55, fg: 54, espn: 56 },
+  { name: "Jesús Luzardo", pos: "SP", team_abbr: "PHI", fp: 56, fg: 57, espn: 54 },
+  { name: "Cal Raleigh", pos: "C", team_abbr: "SEA", fp: 57, fg: 56, espn: 58 },
+  { name: "Logan Webb", pos: "SP", team_abbr: "SF", fp: 58, fg: 59, espn: 57 },
+  { name: "Anthony Volpe", pos: "SS", team_abbr: "NYY", fp: 59, fg: 58, espn: 60 },
+  { name: "Ha-seong Kim", pos: "SS/2B", team_abbr: "SD", fp: 60, fg: 60, espn: 59 },
+  { name: "Royce Lewis", pos: "SS/3B", team_abbr: "MIN", fp: 61, fg: 62, espn: 61 },
+  { name: "James Wood", pos: "OF", team_abbr: "WSH", fp: 62, fg: 61, espn: 63 },
+  { name: "Ryne Stanek", pos: "RP", team_abbr: "HOU", fp: 63, fg: 65, espn: 62 },
+  { name: "Emmanuel Clase", pos: "RP", team_abbr: "CLE", fp: 64, fg: 63, espn: 64 },
+  { name: "Clay Holmes", pos: "RP", team_abbr: "NYY", fp: 65, fg: 64, espn: 66 },
+  { name: "Josh Hader", pos: "RP", team_abbr: "HOU", fp: 66, fg: 66, espn: 65 },
+  { name: "Ryan Helsley", pos: "RP", team_abbr: "STL", fp: 67, fg: 68, espn: 67 },
+  { name: "Mason Miller", pos: "RP", team_abbr: "OAK", fp: 68, fg: 67, espn: 70 },
+  { name: "Pete Fairbanks", pos: "RP", team_abbr: "TB", fp: 69, fg: 70, espn: 68 },
+  { name: "Andrés Muñoz", pos: "RP", team_abbr: "SEA", fp: 70, fg: 69, espn: 69 },
+  { name: "Kenley Jansen", pos: "RP", team_abbr: "BOS", fp: 71, fg: 72, espn: 71 },
+  { name: "Edwin Díaz", pos: "RP", team_abbr: "NYM", fp: 72, fg: 71, espn: 72 },
+  { name: "Austin Riley", pos: "3B", team_abbr: "ATL", fp: 73, fg: 74, espn: 73 },
+  { name: "Michael Busch", pos: "1B/2B", team_abbr: "CHC", fp: 74, fg: 73, espn: 75 },
+  { name: "Steven Kwan", pos: "OF", team_abbr: "CLE", fp: 75, fg: 75, espn: 74 },
+  { name: "Gerrit Cole", pos: "SP", team_abbr: "NYY", fp: 76, fg: 76, espn: 76 },
+  { name: "Drew Rucinski", pos: "SP", team_abbr: "CLE", fp: 77, fg: 78, espn: 77 },
+  { name: "Shane Bieber", pos: "SP", team_abbr: "CLE", fp: 78, fg: 77, espn: 79 },
+  { name: "Triston McKenzie", pos: "SP", team_abbr: "CLE", fp: 79, fg: 80, espn: 78 },
+  { name: "Bryson Stott", pos: "2B/SS", team_abbr: "PHI", fp: 80, fg: 79, espn: 80 },
+  { name: "Max Muncy", pos: "1B/2B/3B", team_abbr: "LAD", fp: 81, fg: 82, espn: 81 },
+  { name: "Ozzie Albies", pos: "2B", team_abbr: "ATL", fp: 82, fg: 81, espn: 83 },
+  { name: "Jorge Soler", pos: "OF/DH", team_abbr: "SF", fp: 83, fg: 84, espn: 82 },
+  { name: "Seiya Suzuki", pos: "OF", team_abbr: "CHC", fp: 84, fg: 83, espn: 85 },
+  { name: "Dansby Swanson", pos: "SS", team_abbr: "CHC", fp: 85, fg: 86, espn: 84 },
+  { name: "Nathaniel Lowe", pos: "1B", team_abbr: "TEX", fp: 86, fg: 85, espn: 87 },
+  { name: "Teoscar Hernández", pos: "OF", team_abbr: "LAD", fp: 87, fg: 88, espn: 86 },
+  { name: "J.T. Realmuto", pos: "C", team_abbr: "PHI", fp: 88, fg: 87, espn: 89 },
+  { name: "Marcus Semien", pos: "2B/SS", team_abbr: "TEX", fp: 89, fg: 90, espn: 88 },
+  { name: "Gleyber Torres", pos: "2B", team_abbr: "DET", fp: 90, fg: 89, espn: 91 },
+  { name: "Ian Happ", pos: "OF", team_abbr: "CHC", fp: 91, fg: 92, espn: 90 },
+  { name: "Paul Goldschmidt", pos: "1B", team_abbr: "NYY", fp: 92, fg: 91, espn: 93 },
+  { name: "Anthony Santander", pos: "OF", team_abbr: "TOR", fp: 93, fg: 94, espn: 92 },
+  { name: "Willy Adames", pos: "SS", team_abbr: "SF", fp: 94, fg: 93, espn: 95 },
+  { name: "Josh Jung", pos: "3B", team_abbr: "TEX", fp: 95, fg: 96, espn: 94 },
+  { name: "Brice Turang", pos: "2B/SS", team_abbr: "MIL", fp: 96, fg: 95, espn: 97 },
+  { name: "Tyler O'Neill", pos: "OF", team_abbr: "BOS", fp: 97, fg: 98, espn: 96 },
+  { name: "Edouard Julien", pos: "2B", team_abbr: "MIN", fp: 98, fg: 97, espn: 99 },
+  { name: "Daulton Varsho", pos: "C/OF", team_abbr: "TOR", fp: 99, fg: 100, espn: 98 },
+  { name: "Sal Frelick", pos: "OF", team_abbr: "MIL", fp: 100, fg: 99, espn: 101 },
+  { name: "Lane Thomas", pos: "OF", team_abbr: "CLE", fp: 101, fg: 102, espn: 100 },
+  { name: "Bryan Reynolds", pos: "OF", team_abbr: "PIT", fp: 102, fg: 101, espn: 103 },
+  { name: "Nestor Cortes", pos: "SP", team_abbr: "MIL", fp: 103, fg: 104, espn: 102 },
+  { name: "Cristian Javier", pos: "SP", team_abbr: "HOU", fp: 104, fg: 103, espn: 105 },
+  { name: "Hunter Brown", pos: "SP", team_abbr: "HOU", fp: 105, fg: 106, espn: 104 },
+  { name: "Framber Valdez", pos: "SP", team_abbr: "HOU", fp: 106, fg: 105, espn: 107 },
+  { name: "Kevin Gausman", pos: "SP", team_abbr: "TOR", fp: 107, fg: 108, espn: 106 },
+  { name: "Corbin Burnes", pos: "SP", team_abbr: "ARI", fp: 108, fg: 107, espn: 109 },
+  { name: "Sandy Alcantara", pos: "SP", team_abbr: "MIA", fp: 109, fg: 110, espn: 108 },
+  { name: "Blake Snell", pos: "SP", team_abbr: "SF", fp: 110, fg: 109, espn: 111 },
+  { name: "Yoshinobu Yamamoto", pos: "SP", team_abbr: "LAD", fp: 111, fg: 112, espn: 110 },
+  { name: "Shota Imanaga", pos: "SP", team_abbr: "CHC", fp: 112, fg: 111, espn: 113 },
+  { name: "Chris Sale", pos: "SP", team_abbr: "ATL", fp: 113, fg: 114, espn: 112 },
+  { name: "Tanner Houck", pos: "SP", team_abbr: "BOS", fp: 114, fg: 113, espn: 115 },
+  { name: "MacKenzie Gore", pos: "SP", team_abbr: "WSH", fp: 115, fg: 116, espn: 114 },
+  { name: "Pablo López", pos: "SP", team_abbr: "MIN", fp: 116, fg: 115, espn: 117 },
+  { name: "Joe Ryan", pos: "SP", team_abbr: "MIN", fp: 117, fg: 118, espn: 116 },
+  { name: "Sonny Gray", pos: "SP", team_abbr: "STL", fp: 118, fg: 117, espn: 119 },
+  { name: "Aaron Nola", pos: "SP", team_abbr: "PHI", fp: 119, fg: 120, espn: 118 },
+  { name: "Freddy Peralta", pos: "SP", team_abbr: "MIL", fp: 120, fg: 119, espn: 121 },
+  { name: "Alexis Díaz", pos: "RP", team_abbr: "CIN", fp: 121, fg: 122, espn: 120 },
+  { name: "David Bednar", pos: "RP", team_abbr: "PIT", fp: 122, fg: 121, espn: 123 },
+  { name: "Devin Williams", pos: "RP", team_abbr: "NYY", fp: 123, fg: 124, espn: 122 },
+  { name: "Jordan Romano", pos: "RP", team_abbr: "TOR", fp: 124, fg: 123, espn: 125 },
+  { name: "A.J. Minter", pos: "RP", team_abbr: "ATL", fp: 125, fg: 126, espn: 124 },
+  { name: "Trevor Megill", pos: "RP", team_abbr: "MIL", fp: 126, fg: 125, espn: 127 },
+  { name: "Carlos Estévez", pos: "RP", team_abbr: "LAA", fp: 127, fg: 128, espn: 126 },
+  { name: "Evan Phillips", pos: "RP", team_abbr: "LAD", fp: 128, fg: 127, espn: 129 },
+  { name: "Bryan Abreu", pos: "RP", team_abbr: "HOU", fp: 129, fg: 130, espn: 128 },
+  { name: "Felix Bautista", pos: "RP", team_abbr: "BAL", fp: 130, fg: 129, espn: 131 },
+  { name: "Camilo Doval", pos: "RP", team_abbr: "SF", fp: 131, fg: 132, espn: 130 },
+  { name: "Tanner Scott", pos: "RP", team_abbr: "LAD", fp: 132, fg: 131, espn: 133 },
+  { name: "José Alvarado", pos: "RP", team_abbr: "PHI", fp: 133, fg: 134, espn: 132 },
+  { name: "Gregory Soto", pos: "RP", team_abbr: "PHI", fp: 134, fg: 133, espn: 135 },
+  { name: "Jhoan Duran", pos: "RP", team_abbr: "MIN", fp: 135, fg: 136, espn: 134 },
+  { name: "Brusdar Graterol", pos: "RP", team_abbr: "LAD", fp: 136, fg: 135, espn: 137 },
+  { name: "Will Smith (C)", pos: "C", team_abbr: "LAD", fp: 137, fg: 138, espn: 136 },
+  { name: "Sean Murphy", pos: "C", team_abbr: "ATL", fp: 138, fg: 137, espn: 139 },
+  { name: "Gabriel Moreno", pos: "C", team_abbr: "ARI", fp: 139, fg: 140, espn: 138 },
+  { name: "Patrick Bailey", pos: "C", team_abbr: "SF", fp: 140, fg: 139, espn: 141 },
+  { name: "Logan O'Hoppe", pos: "C", team_abbr: "LAA", fp: 141, fg: 142, espn: 140 },
+  { name: "Ryan Jeffers", pos: "C", team_abbr: "MIN", fp: 142, fg: 141, espn: 143 },
+  { name: "Bo Naylor", pos: "C", team_abbr: "CLE", fp: 143, fg: 144, espn: 142 },
+  { name: "Tyler Stephenson", pos: "C", team_abbr: "CIN", fp: 144, fg: 143, espn: 145 },
+  { name: "MJ Melendez", pos: "C/OF", team_abbr: "KC", fp: 145, fg: 146, espn: 144 },
+  { name: "William Contreras", pos: "C", team_abbr: "MIL", fp: 146, fg: 145, espn: 147 },
+  { name: "Joey Wiemer", pos: "OF", team_abbr: "MIL", fp: 147, fg: 148, espn: 146 },
+  { name: "Jarren Duran", pos: "OF", team_abbr: "BOS", fp: 148, fg: 147, espn: 149 },
+  { name: "Randy Arozarena", pos: "OF", team_abbr: "SEA", fp: 149, fg: 150, espn: 148 },
+  { name: "Lourdes Gurriel Jr.", pos: "OF", team_abbr: "ARI", fp: 150, fg: 149, espn: 151 },
+  { name: "Luis Robert Jr.", pos: "OF", team_abbr: "CWS", fp: 151, fg: 152, espn: 150 },
+  { name: "Cody Bellinger", pos: "1B/OF", team_abbr: "NYY", fp: 152, fg: 151, espn: 153 },
+  { name: "Alex Verdugo", pos: "OF", team_abbr: "NYY", fp: 153, fg: 154, espn: 152 },
+  { name: "Hunter Renfroe", pos: "OF", team_abbr: "LAA", fp: 154, fg: 153, espn: 155 },
+  { name: "Taylor Ward", pos: "OF", team_abbr: "LAA", fp: 155, fg: 156, espn: 154 },
+  { name: "Eloy Jiménez", pos: "OF/DH", team_abbr: "CWS", fp: 156, fg: 155, espn: 157 },
+  { name: "Jesse Winker", pos: "OF", team_abbr: "WSH", fp: 157, fg: 158, espn: 156 },
+  { name: "Cedric Mullins", pos: "OF", team_abbr: "BAL", fp: 158, fg: 157, espn: 159 },
+  { name: "Gavin Lux", pos: "2B/SS", team_abbr: "LAD", fp: 159, fg: 160, espn: 158 },
+  { name: "Ha-Seong Kim", pos: "SS/2B", team_abbr: "SD", fp: 160, fg: 159, espn: 161 },
+  { name: "Josh Naylor", pos: "1B/OF", team_abbr: "ARI", fp: 161, fg: 162, espn: 160 },
+  { name: "J.D. Davis", pos: "3B/1B", team_abbr: "SF", fp: 162, fg: 161, espn: 163 },
+  { name: "Ryan McMahon", pos: "2B/3B", team_abbr: "COL", fp: 163, fg: 164, espn: 162 },
+  { name: "Nolan Jones", pos: "OF/3B", team_abbr: "COL", fp: 164, fg: 163, espn: 165 },
+  { name: "Tommy Edman", pos: "2B/SS/OF", team_abbr: "LAD", fp: 165, fg: 166, espn: 164 },
+  { name: "Nico Hoerner", pos: "2B/SS", team_abbr: "CHC", fp: 166, fg: 165, espn: 167 },
+  { name: "Leody Taveras", pos: "OF", team_abbr: "TEX", fp: 167, fg: 168, espn: 166 },
+  { name: "Bo Bichette", pos: "SS", team_abbr: "TOR", fp: 168, fg: 167, espn: 169 },
+  { name: "Brendan Donovan", pos: "1B/2B/OF", team_abbr: "STL", fp: 169, fg: 170, espn: 168 },
+  { name: "Matt Vierling", pos: "OF/3B", team_abbr: "DET", fp: 170, fg: 169, espn: 171 },
+  { name: "Michael Kopech", pos: "SP/RP", team_abbr: "LAD", fp: 171, fg: 172, espn: 170 },
+  { name: "Reid Detmers", pos: "SP", team_abbr: "LAA", fp: 172, fg: 171, espn: 173 },
+  { name: "Justin Steele", pos: "SP", team_abbr: "CHC", fp: 173, fg: 174, espn: 172 },
+  { name: "Nathan Eovaldi", pos: "SP", team_abbr: "TEX", fp: 174, fg: 173, espn: 175 },
+  { name: "Miles Mikolas", pos: "SP", team_abbr: "STL", fp: 175, fg: 176, espn: 174 },
+  { name: "Braxton Garrett", pos: "SP", team_abbr: "MIA", fp: 176, fg: 175, espn: 177 },
+  { name: "JP Sears", pos: "SP", team_abbr: "OAK", fp: 177, fg: 178, espn: 176 },
+  { name: "Mitch Keller", pos: "SP", team_abbr: "PIT", fp: 178, fg: 177, espn: 179 },
+  { name: "Kodai Senga", pos: "SP", team_abbr: "NYM", fp: 179, fg: 180, espn: 178 },
+  { name: "Luis Castillo", pos: "SP", team_abbr: "SEA", fp: 180, fg: 179, espn: 181 },
+  { name: "Max Meyer", pos: "SP", team_abbr: "MIA", fp: 181, fg: 182, espn: 180 },
+  { name: "Trevor Williams", pos: "SP", team_abbr: "WSH", fp: 182, fg: 181, espn: 183 },
+  { name: "Yusei Kikuchi", pos: "SP", team_abbr: "HOU", fp: 183, fg: 184, espn: 182 },
+  { name: "Ranger Suárez", pos: "SP", team_abbr: "PHI", fp: 184, fg: 183, espn: 185 },
+  { name: "Bailey Ober", pos: "SP", team_abbr: "MIN", fp: 185, fg: 186, espn: 184 },
+  { name: "Nick Pivetta", pos: "SP", team_abbr: "BOS", fp: 186, fg: 185, espn: 187 },
+  { name: "Tylor Megill", pos: "SP", team_abbr: "NYM", fp: 187, fg: 188, espn: 186 },
+  { name: "Bryse Wilson", pos: "SP", team_abbr: "MIL", fp: 188, fg: 187, espn: 189 },
+  { name: "Jackson Merrill", pos: "OF", team_abbr: "SD", fp: 189, fg: 190, espn: 188 },
+  { name: "Jonatan Clase", pos: "OF", team_abbr: "SEA", fp: 190, fg: 189, espn: 191 },
+  { name: "Lawrence Butler", pos: "OF", team_abbr: "OAK", fp: 191, fg: 192, espn: 190 },
+  { name: "Zach Logue", pos: "SP", team_abbr: "OAK", fp: 192, fg: 191, espn: 193 },
+  { name: "Tanner Bibee", pos: "SP", team_abbr: "CLE", fp: 193, fg: 194, espn: 192 },
+  { name: "Brayan Bello", pos: "SP", team_abbr: "BOS", fp: 194, fg: 193, espn: 195 },
+  { name: "Taj Bradley", pos: "SP", team_abbr: "TB", fp: 195, fg: 196, espn: 194 },
+  { name: "Roansy Contreras", pos: "SP", team_abbr: "PIT", fp: 196, fg: 195, espn: 197 },
+  { name: "Colton Cowser", pos: "OF", team_abbr: "BAL", fp: 197, fg: 198, espn: 196 },
+  { name: "Ceddanne Rafaela", pos: "OF/SS", team_abbr: "BOS", fp: 198, fg: 197, espn: 199 },
+  { name: "Masataka Yoshida", pos: "OF/DH", team_abbr: "BOS", fp: 199, fg: 200, espn: 198 },
+  { name: "Andrew McCutchen", pos: "OF", team_abbr: "PIT", fp: 200, fg: 199, espn: 201 },
+  { name: "Joc Pederson", pos: "OF/DH", team_abbr: "ARI", fp: 201, fg: 202, espn: 200 },
+  { name: "Michael Siani", pos: "OF", team_abbr: "STL", fp: 202, fg: 201, espn: 203 },
+  { name: "DJ LeMahieu", pos: "1B/2B/3B", team_abbr: "NYY", fp: 203, fg: 204, espn: 202 },
+  { name: "Ryan Mountcastle", pos: "1B", team_abbr: "BAL", fp: 204, fg: 203, espn: 205 },
+  { name: "Nick Castellanos", pos: "OF", team_abbr: "PHI", fp: 205, fg: 206, espn: 204 },
+  { name: "Spencer Torkelson", pos: "1B", team_abbr: "DET", fp: 206, fg: 205, espn: 207 },
+  { name: "Triston Casas", pos: "1B", team_abbr: "BOS", fp: 207, fg: 208, espn: 206 },
+  { name: "Christian Walker", pos: "1B", team_abbr: "HOU", fp: 208, fg: 207, espn: 209 },
+  { name: "Andrew Vaughn", pos: "1B/OF", team_abbr: "CWS", fp: 209, fg: 210, espn: 208 },
+  { name: "Vinnie Pasquantino", pos: "1B", team_abbr: "KC", fp: 210, fg: 209, espn: 211 },
+  { name: "Evan Longoria", pos: "3B", team_abbr: "ARI", fp: 211, fg: 212, espn: 210 },
+  { name: "Alec Bohm", pos: "3B/1B", team_abbr: "PHI", fp: 212, fg: 211, espn: 213 },
+  { name: "Eugenio Suárez", pos: "3B/SS", team_abbr: "ARI", fp: 213, fg: 214, espn: 212 },
+  { name: "Yoán Moncada", pos: "3B/2B", team_abbr: "CWS", fp: 214, fg: 213, espn: 215 },
+  { name: "Josh Rojas", pos: "3B/SS/2B", team_abbr: "SEA", fp: 215, fg: 216, espn: 214 },
+  { name: "Maikel Garcia", pos: "3B/SS", team_abbr: "KC", fp: 216, fg: 215, espn: 217 },
+  { name: "Nick Ahmed", pos: "SS", team_abbr: "SF", fp: 217, fg: 218, espn: 216 },
+  { name: "Lenyn Sosa", pos: "SS/2B", team_abbr: "CWS", fp: 218, fg: 217, espn: 219 },
+  { name: "Jose Barrero", pos: "SS", team_abbr: "CIN", fp: 219, fg: 220, espn: 218 },
+  { name: "Christopher Morel", pos: "OF/3B", team_abbr: "CHC", fp: 220, fg: 219, espn: 221 },
+];
+
+// ══════════════════════════════════════════════
+// SAMPLE LOAD
+// ══════════════════════════════════════════════
+function loadSample(src) {
+  const sorted = [...SAMPLE_PLAYERS].sort((a,b) => (a[src] || 9999) - (b[src] || 9999));
+  const text = sorted.map((p, i) => `${i+1}. ${p.name}, ${p.pos}, ${p.team_abbr}`).join('\n');
+  document.getElementById(`${src}-input`).value = text;
+}
+
+function loadAllSamples() {
+  loadSample('fp');
+  loadSample('fg');
+  loadSample('espn');
+}
+
+// ══════════════════════════════════════════════
+// CSV UPLOAD
+// ══════════════════════════════════════════════
+function loadCSV(event, source) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    const converted = csvToRankingText(text);
+    document.getElementById(`${source}-input`).value = converted;
+    const count = converted.split('\n').filter(l => l.trim()).length;
+    document.getElementById(`${source}-csv-status`).textContent =
+      `✓ ${count} players loaded from ${file.name}`;
+    showToast(`${count} players loaded from CSV`);
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function csvToRankingText(csv) {
+  // Parse CSV rows (handles quoted fields)
+  const parseRow = line => {
+    const cols = [];
+    let cur = '', inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuote = !inQuote; }
+      else if (ch === ',' && !inQuote) { cols.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur.trim());
+    return cols;
+  };
+
+  const lines = csv.trim().split('\n');
+  if (lines.length < 2) return csv; // not a real CSV, return as-is
+
+  const header = parseRow(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+  // Detect column indices flexibly — handles FantasyPros, Yahoo, ESPN exports
+  const find = (...keys) => {
+    for (const k of keys) {
+      const i = header.findIndex(h => h.includes(k));
+      if (i !== -1) return i;
+    }
+    return -1;
+  };
+
+  const rankCol  = find('rank', 'rk', '#');
+  const nameCol  = find('playername', 'name', 'player');
+  const posCol   = find('position', 'pos', 'eligibility');
+  const teamCol  = find('team', 'tm', 'nflteam', 'mlbteam');
+
+  if (nameCol === -1) {
+    // No recognized headers — treat as plain text list
+    return csv;
+  }
+
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const cols = parseRow(line);
+    const name = cols[nameCol]?.replace(/"/g, '').trim() || '';
+    if (!name) continue;
+    const rank = rankCol !== -1 ? (parseInt(cols[rankCol]) || i) : i;
+    const pos  = posCol  !== -1 ? (cols[posCol]?.trim()  || 'UTIL') : 'UTIL';
+    const team = teamCol !== -1 ? (cols[teamCol]?.trim() || '?')    : '?';
+    result.push(`${rank}. ${name}, ${pos}, ${team}`);
+  }
+
+  return result.join('\n');
+}
+
+// ══════════════════════════════════════════════
+// IMPORT & PARSE
+// ══════════════════════════════════════════════
+function parsePaste(text) {
+  // Returns [{name, pos, team_abbr, rank}]
+  return text.trim().split('\n').map((line, i) => {
+    line = line.trim();
+    if (!line) return null;
+    // Strip leading rank number: "1. " or "1 "
+    line = line.replace(/^\d+[\.\)]\s*/, '');
+    const parts = line.split(',').map(s => s.trim());
+    const name = parts[0] || line;
+    const pos = parts[1] || 'UTIL';
+    const team = parts[2] || '?';
+    return { name: name.trim(), pos: pos.trim(), team_abbr: team.trim(), rank: i + 1 };
+  }).filter(Boolean);
+}
+
+function normalizeName(n) {
+  return n.toLowerCase()
+    .replace(/[áàä]/g,'a').replace(/[éèê]/g,'e').replace(/[íì]/g,'i')
+    .replace(/[óòö]/g,'o').replace(/[úùü]/g,'u').replace(/[ñ]/g,'n')
+    .replace(/\s+/g,' ').trim();
+}
+
+function processImport() {
+  const fpText = document.getElementById('fp-input').value;
+  const fgText = document.getElementById('fg-input').value;
+  const espnText = document.getElementById('espn-input').value;
+
+  if (!fpText && !fgText && !espnText) {
+    showToast('Please paste at least one set of rankings first.');
+    return;
+  }
+
+  const fpList = fpText ? parsePaste(fpText) : [];
+  const fgList = fgText ? parsePaste(fgText) : [];
+  const espnList = espnText ? parsePaste(espnText) : [];
+
+  // Merge by name
+  const map = {};
+  const addPlayers = (list, key) => {
+    list.forEach(p => {
+      const norm = normalizeName(p.name);
+      if (!map[norm]) {
+        map[norm] = { id: norm, name: p.name, pos: p.pos, team_abbr: p.team_abbr, fp: null, fg: null, espn: null, takenBy: null, isKeeper: false };
+      }
+      map[norm][key] = p.rank;
+      if (p.pos && p.pos !== 'UTIL') map[norm].pos = p.pos;
+      if (p.team_abbr && p.team_abbr !== '?') map[norm].team_abbr = p.team_abbr;
+    });
+  };
+
+  addPlayers(fpList, 'fp');
+  addPlayers(fgList, 'fg');
+  addPlayers(espnList, 'espn');
+
+  // Calculate median rank
+  players = Object.values(map).map(p => {
+    const ranks = [p.fp, p.fg, p.espn].filter(r => r !== null);
+    const sorted = [...ranks].sort((a,b) => a-b);
+    const mid = Math.floor(sorted.length / 2);
+    p.medianRank = sorted.length % 2 === 0
+      ? (sorted[mid-1] + sorted[mid]) / 2
+      : sorted[mid];
+    return p;
+  });
+
+  players.sort((a,b) => a.medianRank - b.medianRank);
+
+  document.getElementById('import-status').textContent = `✓ ${players.length} players loaded`;
+  showToast(`${players.length} players imported successfully`);
+  renderRankings();
+  renderAvailable();
+  renderTeamsGrid();
+  renderBestAvail();
+  buildTeamNamesGrid();
+}
+
+// ══════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+
+  if (name === 'rankings') renderRankings();
+  if (name === 'draft') { renderAvailable(); renderTeamsGrid(); updateNeedsBar(); }
+  if (name === 'bestavail') renderBestAvail();
+  if (name === 'prospects') renderProspects();
+  if (name === 'teams') renderTeamRosters();
+  if (name === 'picks') { initPicksUI(); renderPicksBoard(); }
+  if (name === 'watchlist') renderWatchlist();
+  if (name === 'catrating') renderCatRating();
+}
+
+// ══════════════════════════════════════════════
+// RANKINGS
+// ══════════════════════════════════════════════
+const ALL_POS = ['ALL','C','1B','2B','3B','SS','OF','SP','RP'];
+
+function buildPosFilters() {
+  ['pos-filter', 'draft-pos-filter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = ALL_POS.map(p =>
+      `<button class="pos-pill ${p==='ALL'?'active':''}" onclick="setPosFilter('${p}','${id}')">${p}</button>`
+    ).join('');
+  });
+}
+
+buildPosFilters();
+
+function setPosFilter(pos, filterId) {
+  if (filterId === 'pos-filter') posFilter = pos;
+  else draftPosFilter = pos;
+
+  document.querySelectorAll(`#${filterId} .pos-pill`).forEach(p => {
+    p.classList.toggle('active', p.textContent === pos);
+  });
+  if (filterId === 'pos-filter') renderRankings();
+  else renderAvailable();
+}
+
+function toggleAvailOnly() {
+  availOnly = !availOnly;
+  document.getElementById('avail-toggle').classList.toggle('on', availOnly);
+  renderRankings();
+}
+
+function toggleStats() {
+  showStats = !showStats;
+  document.getElementById('stats-toggle').classList.toggle('on', showStats);
+  renderRankings();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  renderRankings();
+}
+
+function getPosColor(pos) {
+  const p = pos.split('/')[0];
+  if (p==='C') return 'pos-C';
+  if (['1B','2B','3B','CI','MI'].includes(p)) return 'pos-1B';
+  if (p==='SS') return 'pos-SS';
+  if (p==='OF') return 'pos-OF';
+  if (p==='SP') return 'pos-SP';
+  if (p==='RP') return 'pos-RP';
+  return '';
+}
+
+function renderRankings() {
+  if (!players.length) {
+    document.getElementById('rankings-tbody').innerHTML =
+      `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.75rem;">No players imported yet. Go to Import Rankings first.</td></tr>`;
+    return;
+  }
+
+  const search = document.getElementById('rank-search').value.toLowerCase();
+  let filtered = players.filter(p => {
+    if (availOnly && p.takenBy !== null) return false;
+    if (posFilter !== 'ALL' && !p.pos.includes(posFilter)) return false;
+    if (search && !p.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    let av, bv;
+    if (sortKey.startsWith('proj_')) {
+      const stat = sortKey.replace('proj_','');
+      av = projStats[a.id]?.[stat] ?? 9999;
+      bv = projStats[b.id]?.[stat] ?? 9999;
+      // For ERA/WHIP lower is better — flip sort direction display
+    } else {
+      av = a[sortKey]; bv = b[sortKey];
+    }
+    if (av === null || av === undefined) av = 9999;
+    if (bv === null || bv === undefined) bv = 9999;
+    if (typeof av === 'string') return av.localeCompare(bv) * sortDir;
+    return (av - bv) * sortDir;
+  });
+
+  const maxRank = Math.max(...players.map(p=>p.medianRank), 1);
+  const hasStats = Object.keys(projStats).length > 0;
+
+  // Update header if stats mode on
+  const thead = document.getElementById('rankings-thead-row');
+  if (thead) {
+    const statCols = showStats && hasStats ? `
+      <th onclick="sortBy('proj_R')" title="Projected Runs" style="color:var(--accent2)">R<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_HR')" title="Projected HR" style="color:var(--accent2)">HR<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_RBI')" title="Projected RBI" style="color:var(--accent2)">RBI<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_SB')" title="Projected SB" style="color:var(--accent2)">SB<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_AVG')" title="Projected AVG" style="color:var(--accent2)">AVG<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_W')" title="Projected Wins" style="color:var(--accent)">W<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_K')" title="Projected K" style="color:var(--accent)">K<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_ERA')" title="Projected ERA" style="color:var(--accent)">ERA<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_WHIP')" title="Projected WHIP" style="color:var(--accent)">WHIP<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('proj_SVH')" title="Projected SV+H" style="color:var(--accent)">SV+H<span class="sort-arrow">↕</span></th>` : '';
+    thead.innerHTML = `
+      <th onclick="sortBy('medianRank')">#<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('name')">Player<span class="sort-arrow">↕</span></th>
+      <th>Pos</th>
+      <th onclick="sortBy('fp')" title="FantasyPros">FP<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('fg')" title="Yahoo">YHspan class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('espn')" title="ESPN">ESPN<span class="sort-arrow">↕</span></th>
+      <th onclick="sortBy('medianRank')">Median<span class="sort-arrow">↕</span></th>
+      ${statCols}
+      <th>Status</th>
+      <th>Note</th>
+      <th></th>
+      <th title="Watchlist">☆</th>`;
+  }
+
+  document.getElementById('rankings-tbody').innerHTML = filtered.map((p, i) => {
+    const taken = p.takenBy !== null;
+    const teamName = taken ? teams[p.takenBy]?.name : null;
+    const barW = Math.max(2, Math.round((1 - (p.medianRank - 1) / maxRank) * 80));
+    const st = projStats[p.id] || {};
+    const note = playerNotes[p.id];
+    const isPitcher = ['SP','RP'].includes(p.pos.split('/')[0]);
+
+    const statCells = showStats && hasStats ? `
+      <td class="rank-cell" style="color:var(--accent2)">${fmtStat(st.R)}</td>
+      <td class="rank-cell" style="color:var(--accent2)">${fmtStat(st.HR)}</td>
+      <td class="rank-cell" style="color:var(--accent2)">${fmtStat(st.RBI)}</td>
+      <td class="rank-cell" style="color:var(--accent2)">${fmtStat(st.SB)}</td>
+      <td class="rank-cell" style="color:var(--accent2)">${fmtStat(st.AVG,3)}</td>
+      <td class="rank-cell" style="color:var(--accent)">${fmtStat(st.W)}</td>
+      <td class="rank-cell" style="color:var(--accent)">${fmtStat(st.K)}</td>
+      <td class="rank-cell" style="color:var(--accent)">${fmtStat(st.ERA,2)}</td>
+      <td class="rank-cell" style="color:var(--accent)">${fmtStat(st.WHIP,2)}</td>
+      <td class="rank-cell" style="color:var(--accent)">${fmtStat(st.SVH)}</td>` : '';
+
+    return `<tr class="${taken ? 'taken' : ''} anim-in">
+      <td><span class="rank-num">${i+1}</span></td>
+      <td>
+        <span class="player-name">${p.name}</span>
+        <span class="player-team">${p.team_abbr}</span>
+      </td>
+      <td><span class="pos-badge ${getPosColor(p.pos)}">${p.pos.split('/')[0]}</span></td>
+      <td class="rank-cell">${p.fp ?? '—'}</td>
+      <td class="rank-cell">${p.fg ?? '—'}</td>
+      <td class="rank-cell">${p.espn ?? '—'}</td>
+      <td>
+        <div class="median-bar-wrap">
+          <span class="median-cell">${p.medianRank % 1 === 0 ? p.medianRank : p.medianRank.toFixed(1)}</span>
+          <div class="median-bar" style="width:${barW}px"></div>
+        </div>
+      </td>
+      ${statCells}
+      <td>
+        ${taken
+          ? `<span class="taken-badge">${p.isKeeper ? '🔒 ' : ''}${teamName ?? 'Taken'}</span>`
+          : '<span style="color:var(--green);font-family:\'IBM Plex Mono\',monospace;font-size:0.65rem;">Available</span>'
+        }
+      </td>
+      <td>
+        <button onclick="openNote('${p.id}','${p.name.replace(/'/g,"\\'")}')
+        " title="${note ? note.slice(0,60) : 'Add note'}" style="background:${note?'rgba(184,134,11,0.12)':'none'};border:1px solid ${note?'rgba(184,134,11,0.4)':'var(--border)'};border-radius:3px;padding:2px 7px;cursor:pointer;font-size:0.75rem;color:${note?'var(--gold)':'var(--muted)'};transition:all 0.1s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='${note?'rgba(184,134,11,0.4)':'var(--border)'}';this.style.color='${note?'var(--gold)':'var(--muted)'}'">
+          ${note ? '📝' : '+'}
+        </button>
+      </td>
+      <td>
+        ${!taken ? `<button class="draft-quick-btn" onclick="quickDraft('${p.id}')">Draft</button>` : ''}
+      </td>
+      <td>
+        <button onclick="toggleWatch('${p.id}')" title="${isWatched(p.id)?'Remove from watchlist':'Add to watchlist'}" style="background:${isWatched(p.id)?'rgba(200,67,26,0.1)':'none'};border:1px solid ${isWatched(p.id)?'var(--accent)':'var(--border)'};border-radius:3px;padding:2px 7px;cursor:pointer;font-size:0.75rem;color:${isWatched(p.id)?'var(--accent)':'var(--muted)'};transition:all 0.12s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='${isWatched(p.id)?'var(--accent)':'var(--border)'}';this.style.color='${isWatched(p.id)?'var(--accent)':'var(--muted)'}'">
+          ${isWatched(p.id) ? '★' : '☆'}
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// DRAFT BOARD - AVAILABLE LIST
+// ══════════════════════════════════════════════
+function renderAvailable() {
+  if (!players.length) {
+    document.getElementById('available-list').innerHTML =
+      `<div class="empty-drop" style="padding:30px;">Import rankings first →</div>`;
+    return;
+  }
+
+  const search = document.getElementById('avail-search').value.toLowerCase();
+  let avail = players.filter(p => {
+    if (p.takenBy !== null) return false;
+    if (draftPosFilter !== 'ALL' && !p.pos.includes(draftPosFilter)) return false;
+    if (search && !p.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const maxRank = Math.max(...players.map(p=>p.medianRank), 1);
+  const list = document.getElementById('available-list');
+
+  list.innerHTML = avail.map(p => {
+    return `<div class="player-card" draggable="true"
+        data-id="${p.id}"
+        ondragstart="onDragStart(event, '${p.id}')"
+        ondragend="onDragEnd(event)">
+      <div class="player-card-left">
+        <span class="pc-rank">#${p.medianRank % 1 === 0 ? p.medianRank : p.medianRank.toFixed(1)}</span>
+        <span class="pos-badge ${getPosColor(p.pos)}" style="font-size:0.55rem;padding:2px 5px;">${p.pos.split('/')[0]}</span>
+        <div>
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-meta">${p.team_abbr}</div>
+        </div>
+      </div>
+      <div class="pc-right">
+        <span class="pc-score">${p.medianRank % 1 === 0 ? p.medianRank : p.medianRank.toFixed(1)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  updatePickCounter();
+}
+
+// ══════════════════════════════════════════════
+// TEAM GRID
+// ══════════════════════════════════════════════
+function renderTeamsGrid() {
+  const clockTeamSel = document.getElementById('clock-team');
+  const clockTeamId = parseInt(clockTeamSel.value);
+
+  // Rebuild team selector
+  clockTeamSel.innerHTML = '<option value="">— select team —</option>' +
+    teams.map(t => `<option value="${t.id}" ${t.id === clockTeamId ? 'selected' : ''}>${t.name}</option>`).join('');
+
+  const grid = document.getElementById('teams-grid');
+  grid.innerHTML = teams.map(t => {
+    const onClock = t.id === clockTeamId;
+    const keepers = t.roster.filter(id => {
+      const p = players.find(x=>x.id===id);
+      return p?.isKeeper;
+    });
+    const drafted = t.roster.filter(id => {
+      const p = players.find(x=>x.id===id);
+      return p && !p.isKeeper;
+    });
+
+    const renderSlots = (ids, isKeeperSection) => ids.map(pid => {
+      const p = players.find(x => x.id === pid);
+      if (!p) return '';
+      return `<div class="roster-slot">
+        <div class="rs-left">
+          <span class="pos-badge ${getPosColor(p.pos)}" style="font-size:0.55rem;padding:1px 4px;">${p.pos.split('/')[0]}</span>
+          <span class="rs-name">${p.name}</span>
+          ${isKeeperSection ? '<span class="keeper-badge">KEEP</span>' : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="rs-rank">#${p.medianRank % 1 === 0 ? p.medianRank : p.medianRank.toFixed(1)}</span>
+          <button class="rs-remove" onclick="removeFromTeam(${t.id}, '${pid}')">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="team-card ${onClock ? 'on-clock-team' : ''}" id="team-card-${t.id}">
+      <div class="team-header">
+        <input class="team-name-input" value="${t.name}" placeholder="Team ${t.id+1}"
+          onchange="renameTeam(${t.id}, this.value)" onclick="event.stopPropagation()">
+        <span class="team-count">${t.roster.length}</span>
+      </div>
+      <div class="team-roster">
+        <div class="team-drop-zone"
+          id="drop-${t.id}"
+          ondragover="onDragOver(event)"
+          ondragleave="onDragLeave(event)"
+          ondrop="onDrop(event, ${t.id})">
+          ${t.roster.length === 0
+            ? `<div class="empty-drop">Drop players here</div>`
+            : `
+              ${keepers.length > 0 ? `
+                <div class="roster-divider">Keepers</div>
+                ${renderSlots(keepers, true)}
+              ` : ''}
+              ${drafted.length > 0 ? `
+                ${keepers.length > 0 ? '<div class="roster-divider">Drafted</div>' : ''}
+                ${renderSlots(drafted, false)}
+              ` : ''}
+            `
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renameTeam(teamId, newName) {
+  teams[teamId].name = newName;
+  renderTeamsGrid();
+  renderBestAvail();
+}
+
+function removeFromTeam(teamId, playerId) {
+  const team = teams[teamId];
+  team.roster = team.roster.filter(id => id !== playerId);
+  const p = players.find(x => x.id === playerId);
+  if (p) { p.takenBy = null; p.isKeeper = false; }
+  renderTeamsGrid();
+  renderAvailable();
+  renderRankings();
+  renderBestAvail();
+}
+
+// ══════════════════════════════════════════════
+// DRAG & DROP
+// ══════════════════════════════════════════════
+function onDragStart(e, playerId) {
+  dragPlayerId = playerId;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => {
+    const card = document.querySelector(`[data-id="${playerId}"]`);
+    if (card) card.classList.add('dragging');
+  }, 0);
+
+  const ghost = document.getElementById('drag-ghost');
+  const p = players.find(x => x.id === playerId);
+  ghost.textContent = p ? `${p.name} · #${p.medianRank}` : '';
+  ghost.style.opacity = '1';
+}
+
+function onDragEnd(e) {
+  dragPlayerId = null;
+  document.querySelectorAll('.player-card').forEach(c => c.classList.remove('dragging'));
+  document.getElementById('drag-ghost').style.opacity = '0';
+  document.querySelectorAll('.team-drop-zone').forEach(z => z.classList.remove('drag-over'));
+}
+
+document.addEventListener('dragover', e => {
+  const ghost = document.getElementById('drag-ghost');
+  ghost.style.left = (e.clientX + 12) + 'px';
+  ghost.style.top = (e.clientY + 12) + 'px';
+});
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function onDrop(e, teamId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragPlayerId) return;
+  assignPlayer(dragPlayerId, teamId, false);
+}
+
+// ══════════════════════════════════════════════
+// ASSIGNING PLAYERS
+// ══════════════════════════════════════════════
+function assignPlayer(playerId, teamId, asKeeper) {
+  const p = players.find(x => x.id === playerId);
+  if (!p) return;
+
+  // Remove from old team if already assigned
+  if (p.takenBy !== null) {
+    teams[p.takenBy].roster = teams[p.takenBy].roster.filter(id => id !== playerId);
+  }
+
+  p.takenBy = teamId;
+  p.isKeeper = asKeeper;
+  if (!teams[teamId].roster.includes(playerId)) {
+    teams[teamId].roster.push(playerId);
+  }
+
+  renderTeamsGrid();
+  renderAvailable();
+  renderRankings();
+  renderBestAvail();
+  showToast(`${p.name} → ${teams[teamId].name}${asKeeper ? ' (Keeper)' : ''}`);
+}
+
+function quickDraft(playerId) {
+  const clockTeamId = parseInt(document.getElementById('clock-team').value);
+  if (isNaN(clockTeamId)) {
+    showToast('Set the team on the clock first in the Draft Board tab.');
+    return;
+  }
+  assignPlayer(playerId, clockTeamId, false);
+  advancePick();
+}
+
+// ══════════════════════════════════════════════
+// SNAKE DRAFT CLOCK
+// ══════════════════════════════════════════════
+function updateClock() {
+  const sel = document.getElementById('clock-team');
+  const display = document.getElementById('clock-display');
+  const id = parseInt(sel.value);
+  if (isNaN(id)) { display.style.display = 'none'; updateNeedsBar(); return; }
+  display.style.display = 'block';
+  display.textContent = teams[id].name;
+  renderTeamsGrid();
+  updateNeedsBar();
+}
+
+function advancePick() {
+  currentPickIdx = (currentPickIdx + 1) % pickOrder.length;
+  const nextTeamId = pickOrder[currentPickIdx];
+  const sel = document.getElementById('clock-team');
+  sel.value = nextTeamId;
+  updateClock();
+  updatePickCounter();
+}
+
+function updatePickCounter() {
+  const round = Math.floor(currentPickIdx / NUM_TEAMS) + 1;
+  const pickInRound = (currentPickIdx % NUM_TEAMS) + 1;
+  document.getElementById('pick-counter').textContent = `Round ${round}, Pick ${pickInRound} (Overall: ${currentPickIdx + 1})`;
+}
+
+// ══════════════════════════════════════════════
+// KEEPERS — right-click on available card = mark as keeper
+// ══════════════════════════════════════════════
+// We implement keeper assignment via a context menu approach on team cards
+// and a "Mark as Keeper" toggle on roster slots
+
+// ══════════════════════════════════════════════
+// TEAM NAMES GRID (import tab)
+// ══════════════════════════════════════════════
+function buildTeamNamesGrid() {
+  const grid = document.getElementById('team-names-grid');
+  grid.innerHTML = teams.map(t => `
+    <div>
+      <label>Team ${t.id + 1}</label>
+      <input type="text" value="${t.name}" placeholder="Team ${t.id+1}"
+        onchange="renameTeamFromImport(${t.id}, this.value)">
+    </div>
+  `).join('');
+}
+
+function renameTeamFromImport(teamId, name) {
+  teams[teamId].name = name;
+}
+
+buildTeamNamesGrid();
+
+// ══════════════════════════════════════════════
+// BEST AVAILABLE
+// ══════════════════════════════════════════════
+const BA_POSITIONS = [
+  { label: 'Catcher', pos: 'C' },
+  { label: 'First Base', pos: '1B' },
+  { label: 'Shortstop', pos: 'SS' },
+  { label: 'Outfield', pos: 'OF' },
+  { label: 'Starting Pitcher', pos: 'SP' },
+  { label: 'Relief Pitcher', pos: 'RP' },
+  { label: '2B / 3B', pos: '2B' },
+  { label: 'Overall', pos: 'ALL' },
+];
+
+function renderBestAvail() {
+  const avail = players.filter(p => p.takenBy === null);
+
+  const grid = document.getElementById('ba-grid');
+  grid.innerHTML = BA_POSITIONS.slice(0,7).map(({ label, pos }) => {
+    const filtered = pos === 'ALL' ? avail : avail.filter(p => p.pos.includes(pos));
+    const top5 = filtered.slice(0, 5);
+
+    return `<div class="ba-card">
+      <div class="ba-card-header">${label}</div>
+      ${top5.length === 0
+        ? '<div style="padding:16px;font-family:\'IBM Plex Mono\',monospace;font-size:0.7rem;color:var(--muted);text-align:center;">None available</div>'
+        : top5.map((p, i) => `
+          <div class="ba-player" onclick="quickDraft('${p.id}')">
+            <span class="ba-rank-num">${i+1}</span>
+            <div style="flex:1">
+              <div class="ba-name">${p.name}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted)">${p.team_abbr}</div>
+            </div>
+            <span class="ba-score">#${p.medianRank % 1 === 0 ? p.medianRank : p.medianRank.toFixed(1)}</span>
+          </div>`).join('')
+      }
+    </div>`;
+  }).join('');
+
+  // Overall top 20
+  const tbody = document.getElementById('ba-overall-tbody');
+  tbody.innerHTML = avail.slice(0, 20).map((p, i) => `
+    <tr>
+      <td><span class="rank-num">${i+1}</span></td>
+      <td><span class="player-name">${p.name}</span> <span class="player-team">${p.team_abbr}</span></td>
+      <td><span class="pos-badge ${getPosColor(p.pos)}">${p.pos.split('/')[0]}</span></td>
+      <td class="median-cell">${p.medianRank % 1 === 0 ? p.medianRank : p.medianRank.toFixed(1)}</td>
+      <td class="rank-cell">${p.fp ?? '—'}</td>
+      <td class="rank-cell">${p.fg ?? '—'}</td>
+      <td class="rank-cell">${p.espn ?? '—'}</td>
+      <td><button class="draft-quick-btn" style="opacity:1" onclick="quickDraft('${p.id}')">Draft</button></td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// KEEPER TOGGLE — right-click a roster slot
+// ══════════════════════════════════════════════
+document.addEventListener('contextmenu', e => {
+  const slot = e.target.closest('.roster-slot');
+  if (!slot) return;
+  e.preventDefault();
+  const teamCard = slot.closest('.team-card');
+  const teamId = parseInt(teamCard?.id?.replace('team-card-',''));
+  const removeBtn = slot.querySelector('.rs-remove');
+  const name = slot.querySelector('.rs-name')?.textContent;
+  const p = players.find(x => x.name === name && x.takenBy === teamId);
+  if (!p) return;
+  p.isKeeper = !p.isKeeper;
+  showToast(`${p.name} ${p.isKeeper ? '🔒 marked as keeper' : 'removed from keepers'}`);
+  renderTeamsGrid();
+});
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════════
+// SAVE / LOAD
+// ══════════════════════════════════════════════
+function exportData() {
+  if (!players.length) {
+    showToast('Nothing to save yet — import rankings first.');
+    return;
+  }
+  const state = {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    players, teams, prospects, prosSourceNames,
+    projStats, playerNotes, draftPicks, watchlist,
+    currentPickIdx,
+    rawInputs: {
+      fp: document.getElementById('fp-input').value,
+      fg: document.getElementById('fg-input').value,
+      espn: document.getElementById('espn-input').value,
+      pros0: document.getElementById('pros-input-0').value,
+      pros1: document.getElementById('pros-input-1').value,
+      pros2: document.getElementById('pros-input-2').value,
+      prosSrc0: document.getElementById('pros-src1-name').value,
+      prosSrc1: document.getElementById('pros-src2-name').value,
+      prosSrc2: document.getElementById('pros-src3-name').value,
+    }
+  };
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `dynasty-draft-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Draft saved!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const state = JSON.parse(e.target.result);
+      if (!state.players || !state.teams) throw new Error('Invalid file');
+
+      players = state.players;
+      teams = state.teams;
+      prospects = state.prospects || [];
+      prosSourceNames = state.prosSourceNames || ['Source 1','Source 2','Source 3'];
+      projStats = state.projStats || {};
+      playerNotes = state.playerNotes || {};
+      draftPicks = state.draftPicks || [];
+      watchlist = state.watchlist || {};
+      currentPickIdx = state.currentPickIdx ?? 0;
+
+      if (state.rawInputs) {
+        if (state.rawInputs.fp) document.getElementById('fp-input').value = state.rawInputs.fp;
+        if (state.rawInputs.fg) document.getElementById('fg-input').value = state.rawInputs.fg;
+        if (state.rawInputs.espn) document.getElementById('espn-input').value = state.rawInputs.espn;
+        if (state.rawInputs.pros0) document.getElementById('pros-input-0').value = state.rawInputs.pros0;
+        if (state.rawInputs.pros1) document.getElementById('pros-input-1').value = state.rawInputs.pros1;
+        if (state.rawInputs.pros2) document.getElementById('pros-input-2').value = state.rawInputs.pros2;
+        if (state.rawInputs.prosSrc0) document.getElementById('pros-src1-name').value = state.rawInputs.prosSrc0;
+        if (state.rawInputs.prosSrc1) document.getElementById('pros-src2-name').value = state.rawInputs.prosSrc1;
+        if (state.rawInputs.prosSrc2) document.getElementById('pros-src3-name').value = state.rawInputs.prosSrc2;
+      }
+
+      // Restore prospect source header names
+      [0,1,2].forEach(i => {
+        const th = document.getElementById(`pros-th-${i}`);
+        if (th) th.innerHTML = (prosSourceNames[i] || `Source ${i+1}`).slice(0,8) + ' <span class="sort-arrow">↕</span>';
+      });
+
+      document.getElementById('import-status').textContent =
+        `✓ ${players.length} players loaded from save`;
+
+      buildTeamNamesGrid();
+      renderRankings();
+      renderAvailable();
+      renderTeamsGrid();
+      renderBestAvail();
+      renderKeeperPreview();
+      if (prospects.length) { buildProsPosFilter(); renderProspects(); }
+      updatePickCounter();
+
+      const saved = state.savedAt ? new Date(state.savedAt).toLocaleString() : 'unknown';
+      showToast(`✓ Draft loaded — saved ${saved}`);
+    } catch(err) {
+      showToast('Error loading file — make sure it\'s a valid draft save.');
+    }
+  };
+  reader.readAsText(file);
+  // Reset input so same file can be loaded again if needed
+  event.target.value = '';
+}
+
+// ══════════════════════════════════════════════
+// PROSPECTS
+// ══════════════════════════════════════════════
+let prospects = [];   // { id, name, pos, org, eta, s0, s1, s2, medianRank }
+let prosSortKey = 'medianRank';
+let prosSortDir = 1;
+let prosPosFilter = 'ALL';
+let prosSourceNames = ['Source 1', 'Source 2', 'Source 3'];
+
+const SAMPLE_PROSPECTS = [
+  { name: "Wyatt Langford", pos: "OF", org: "TEX", eta: "2024", s0: 1, s1: 2, s2: 3 },
+  { name: "Jackson Holliday", pos: "SS", org: "BAL", eta: "2024", s0: 2, s1: 1, s2: 1 },
+  { name: "Dylan Crews", pos: "OF", org: "WSH", eta: "2024", s0: 3, s1: 3, s2: 2 },
+  { name: "Paul Skenes", pos: "SP", org: "PIT", eta: "2024", s0: 4, s1: 4, s2: 5 },
+  { name: "Jackson Chourio", pos: "OF", org: "MIL", eta: "2024", s0: 5, s1: 5, s2: 4 },
+  { name: "Evan Carter", pos: "OF", org: "TEX", eta: "2024", s0: 6, s1: 6, s2: 7 },
+  { name: "Junior Caminero", pos: "3B", org: "TB", eta: "2024", s0: 7, s1: 8, s2: 6 },
+  { name: "Colton Cowser", pos: "OF", org: "BAL", eta: "2024", s0: 8, s1: 7, s2: 8 },
+  { name: "Jordan Lawlar", pos: "SS", org: "ARI", eta: "2024", s0: 9, s1: 10, s2: 9 },
+  { name: "Colt Keith", pos: "2B", org: "DET", eta: "2024", s0: 10, s1: 9, s2: 11 },
+  { name: "James Wood", pos: "OF", org: "WSH", eta: "2024", s0: 11, s1: 11, s2: 10 },
+  { name: "Pete Crow-Armstrong", pos: "OF", org: "CHC", eta: "2024", s0: 12, s1: 12, s2: 12 },
+  { name: "Kyle Harrison", pos: "SP", org: "SF", eta: "2024", s0: 13, s1: 14, s2: 13 },
+  { name: "Yoshinobu Yamamoto", pos: "SP", org: "LAD", eta: "2024", s0: 14, s1: 13, s2: 15 },
+  { name: "Jackson Merrill", pos: "OF", org: "SD", eta: "2024", s0: 15, s1: 15, s2: 14 },
+  { name: "Elly De La Cruz", pos: "SS", org: "CIN", eta: "2023", s0: 16, s1: 16, s2: 16 },
+  { name: "Noelvi Marte", pos: "3B/SS", org: "CIN", eta: "2024", s0: 17, s1: 18, s2: 17 },
+  { name: "Endy Rodríguez", pos: "C/OF", org: "PIT", eta: "2024", s0: 18, s1: 17, s2: 19 },
+  { name: "Jonatan Clase", pos: "OF", org: "SEA", eta: "2024", s0: 19, s1: 20, s2: 18 },
+  { name: "Roki Sasaki", pos: "SP", org: "LAD", eta: "2025", s0: 20, s1: 19, s2: 20 },
+  { name: "Coby Mayo", pos: "3B", org: "BAL", eta: "2024", s0: 21, s1: 22, s2: 21 },
+  { name: "Emmett Sheehan", pos: "SP", org: "LAD", eta: "2024", s0: 22, s1: 21, s2: 23 },
+  { name: "Max Clark", pos: "OF", org: "DET", eta: "2026", s0: 23, s1: 23, s2: 22 },
+  { name: "Druw Jones", pos: "OF", org: "ARI", eta: "2026", s0: 24, s1: 25, s2: 24 },
+  { name: "Ethan Salas", pos: "C", org: "SD", eta: "2026", s0: 25, s1: 24, s2: 26 },
+  { name: "Brady House", pos: "SS", org: "WSH", eta: "2025", s0: 26, s1: 26, s2: 25 },
+  { name: "Cam Collier", pos: "3B", org: "CIN", eta: "2026", s0: 27, s1: 28, s2: 27 },
+  { name: "Walker Jenkins", pos: "OF", org: "MIN", eta: "2027", s0: 28, s1: 27, s2: 29 },
+  { name: "Colson Montgomery", pos: "SS", org: "CWS", eta: "2025", s0: 29, s1: 29, s2: 28 },
+  { name: "Hurston Waldrep", pos: "SP", org: "ATL", eta: "2025", s0: 30, s1: 30, s2: 30 },
+  { name: "Roman Anthony", pos: "OF", org: "BOS", eta: "2026", s0: 31, s1: 31, s2: 32 },
+  { name: "Arol Vera", pos: "SS", org: "OAK", eta: "2027", s0: 32, s1: 33, s2: 31 },
+  { name: "Chase Davis", pos: "OF", org: "STL", eta: "2025", s0: 33, s1: 32, s2: 34 },
+  { name: "Orelvis Martinez", pos: "SS/3B", org: "TOR", eta: "2024", s0: 34, s1: 34, s2: 33 },
+  { name: "Jasson Domínguez", pos: "OF", org: "NYY", eta: "2024", s0: 35, s1: 36, s2: 35 },
+  { name: "Diego Cartaya", pos: "C", org: "LAD", eta: "2025", s0: 36, s1: 35, s2: 37 },
+  { name: "Cade Horton", pos: "SP", org: "CHC", eta: "2025", s0: 37, s1: 37, s2: 36 },
+  { name: "Cristian Hernandez", pos: "SS", org: "CHC", eta: "2026", s0: 38, s1: 39, s2: 38 },
+  { name: "Bryce Eldridge", pos: "1B/SP", org: "SF", eta: "2027", s0: 39, s1: 38, s2: 40 },
+  { name: "Kevin McGonigle", pos: "2B", org: "SD", eta: "2027", s0: 40, s1: 40, s2: 39 },
+  { name: "Termarr Johnson", pos: "2B", org: "PIT", eta: "2025", s0: 41, s1: 42, s2: 41 },
+  { name: "Samuel Basallo", pos: "C", org: "BAL", eta: "2026", s0: 42, s1: 41, s2: 43 },
+  { name: "Zyhir Hope", pos: "OF", org: "CLE", eta: "2027", s0: 43, s1: 43, s2: 42 },
+  { name: "Harry Ford", pos: "C", org: "SEA", eta: "2025", s0: 44, s1: 45, s2: 44 },
+  { name: "Mick Abel", pos: "SP", org: "PHI", eta: "2025", s0: 45, s1: 44, s2: 46 },
+  { name: "Curtis Mead", pos: "3B/2B", org: "TB", eta: "2024", s0: 46, s1: 46, s2: 45 },
+  { name: "Jett Williams", pos: "SS", org: "NYM", eta: "2025", s0: 47, s1: 48, s2: 47 },
+  { name: "Emmanuel Rodriguez", pos: "OF", org: "MIN", eta: "2025", s0: 48, s1: 47, s2: 49 },
+  { name: "Kyle Manzardo", pos: "1B", org: "CLE", eta: "2024", s0: 49, s1: 50, s2: 48 },
+  { name: "Theo Gillen", pos: "OF", org: "CIN", eta: "2027", s0: 50, s1: 49, s2: 51 },
+];
+
+function loadSampleProspects() {
+  const fmt = arr => arr.map((p,i) => `${i+1}. ${p.name}, ${p.pos}, ${p.org}`).join('\n');
+  document.getElementById('pros-input-0').value = fmt(SAMPLE_PROSPECTS);
+  document.getElementById('pros-input-1').value = fmt([...SAMPLE_PROSPECTS].sort((a,b)=>a.s1-b.s1));
+  document.getElementById('pros-input-2').value = fmt([...SAMPLE_PROSPECTS].sort((a,b)=>a.s2-b.s2));
+  document.getElementById('pros-src1-name').value = 'Baseball America';
+  document.getElementById('pros-src2-name').value = 'MLB Pipeline';
+  document.getElementById('pros-src3-name').value = 'Yahoo';
+}
+
+function loadProspectCSV(event, srcIdx) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const converted = csvToRankingText(e.target.result);
+    document.getElementById(`pros-input-${srcIdx}`).value = converted;
+    const count = converted.split('\n').filter(l => l.trim()).length;
+    document.getElementById(`pros-csv-status-${srcIdx}`).textContent = `✓ ${count} prospects from ${file.name}`;
+    showToast(`${count} prospects loaded from CSV`);
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function processProspects() {
+  const inputs = [0,1,2].map(i => document.getElementById(`pros-input-${i}`).value);
+  if (inputs.every(t => !t.trim())) {
+    showToast('Paste or upload at least one prospect list first.');
+    return;
+  }
+
+  prosSourceNames = [0,1,2].map(i => {
+    const v = document.getElementById(`pros-src${i+1}-name`).value.trim();
+    return v || `Source ${i+1}`;
+  });
+
+  // Update table headers
+  [0,1,2].forEach(i => {
+    const th = document.getElementById(`pros-th-${i}`);
+    if (th) th.innerHTML = prosSourceNames[i].slice(0,8) + ' <span class="sort-arrow">↕</span>';
+  });
+
+  const lists = inputs.map(t => t.trim() ? parsePaste(t) : []);
+  const map = {};
+
+  lists.forEach((list, si) => {
+    list.forEach(p => {
+      const norm = normalizeName(p.name);
+      if (!map[norm]) {
+        map[norm] = { id: norm, name: p.name, pos: p.pos, org: p.team_abbr, eta: '—', s0: null, s1: null, s2: null };
+      }
+      map[norm][`s${si}`] = p.rank;
+      if (p.pos && p.pos !== 'UTIL') map[norm].pos = p.pos;
+      if (p.team_abbr && p.team_abbr !== '?') map[norm].org = p.team_abbr;
+    });
+  });
+
+  prospects = Object.values(map).map(p => {
+    const ranks = [p.s0, p.s1, p.s2].filter(r => r !== null);
+    const sorted = [...ranks].sort((a,b) => a-b);
+    const mid = Math.floor(sorted.length / 2);
+    p.medianRank = sorted.length % 2 === 0 ? (sorted[mid-1]+sorted[mid])/2 : sorted[mid];
+    return p;
+  });
+
+  prospects.sort((a,b) => a.medianRank - b.medianRank);
+
+  document.getElementById('pros-status').textContent = `✓ ${prospects.length} prospects loaded`;
+  showToast(`${prospects.length} prospects processed`);
+  buildProsPosFilter();
+  renderProspects();
+}
+
+function buildProsPosFilter() {
+  const el = document.getElementById('pros-pos-filter');
+  const positions = ['ALL', ...new Set(prospects.map(p => p.pos.split('/')[0]))].slice(0,10);
+  el.innerHTML = positions.map(p =>
+    `<button class="pos-pill ${p==='ALL'?'active':''}" onclick="setProsFilter('${p}')">${p}</button>`
+  ).join('');
+}
+
+function setProsFilter(pos) {
+  prosPosFilter = pos;
+  document.querySelectorAll('#pros-pos-filter .pos-pill').forEach(p =>
+    p.classList.toggle('active', p.textContent === pos)
+  );
+  renderProspects();
+}
+
+function sortProspectsBy(key) {
+  if (prosSortKey === key) prosSortDir *= -1;
+  else { prosSortKey = key; prosSortDir = 1; }
+  renderProspects();
+}
+
+// ETA color coding
+function etaColor(eta) {
+  if (!eta || eta === '—') return 'var(--muted)';
+  const yr = parseInt(eta);
+  if (yr <= 2024) return 'var(--green)';
+  if (yr === 2025) return '#b8860b';
+  if (yr === 2026) return '#e85c30';
+  return 'var(--muted)';
+}
+
+function renderProspects() {
+  const tbody = document.getElementById('pros-tbody');
+  if (!prospects.length) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.75rem;">Import prospect rankings to get started.</td></tr>`;
+    return;
+  }
+
+  const search = (document.getElementById('pros-search')?.value || '').toLowerCase();
+
+  let filtered = prospects.filter(p => {
+    if (prosPosFilter !== 'ALL' && !p.pos.includes(prosPosFilter)) return false;
+    if (search && !p.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  filtered.sort((a,b) => {
+    let av = a[prosSortKey], bv = b[prosSortKey];
+    if (av === null || av === undefined) av = 9999;
+    if (bv === null || bv === undefined) bv = 9999;
+    if (typeof av === 'string') return av.localeCompare(bv) * prosSortDir;
+    return (av - bv) * prosSortDir;
+  });
+
+  const maxRank = Math.max(...prospects.map(p=>p.medianRank), 1);
+
+  tbody.innerHTML = filtered.map((p, i) => {
+    const barW = Math.max(2, Math.round((1 - (p.medianRank-1)/maxRank) * 60));
+    // Check if this prospect is also in the main player pool
+    const inPool = players.find(pl => normalizeName(pl.name) === p.id);
+    const takenBy = inPool?.takenBy !== null && inPool?.takenBy !== undefined
+      ? teams[inPool.takenBy]?.name : null;
+
+    return `<tr class="anim-in" style="${takenBy ? 'opacity:0.45;' : ''}">
+      <td><span class="rank-num">${i+1}</span></td>
+      <td>
+        <span class="player-name">${p.name}</span>
+        ${takenBy ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);margin-left:6px;">(${takenBy})</span>` : ''}
+      </td>
+      <td><span class="pos-badge ${getPosColor(p.pos)}">${p.pos.split('/')[0]}</span></td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted)">${p.org}</td>
+      <td class="rank-cell">${p.s0 ?? '—'}</td>
+      <td class="rank-cell">${p.s1 ?? '—'}</td>
+      <td class="rank-cell">${p.s2 ?? '—'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="median-cell">${p.medianRank % 1 === 0 ? p.medianRank : p.medianRank.toFixed(1)}</span>
+          <div style="height:6px;border-radius:3px;background:var(--accent2);width:${barW}px;opacity:0.6;"></div>
+        </div>
+      </td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;font-weight:500;color:${etaColor(p.eta)}">${p.eta}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// KEEPER CSV IMPORT
+// ══════════════════════════════════════════════
+
+// League roster slots (from settings)
+const LEAGUE_SLOTS = [
+  { slot: 'C',    pos: ['C'],              count: 1 },
+  { slot: '1B',   pos: ['1B'],             count: 1 },
+  { slot: '2B',   pos: ['2B'],             count: 1 },
+  { slot: '3B',   pos: ['3B'],             count: 1 },
+  { slot: 'SS',   pos: ['SS'],             count: 1 },
+  { slot: 'OF',   pos: ['OF'],             count: 3 },
+  { slot: 'UTIL', pos: ['C','1B','2B','3B','SS','OF','DH'], count: 1 },
+  { slot: 'SP',   pos: ['SP'],             count: 3 },
+  { slot: 'RP',   pos: ['RP'],             count: 1 },
+  { slot: 'P',    pos: ['SP','RP','P'],    count: 2 },
+  { slot: 'BN',   pos: null,               count: 10 },
+  { slot: 'IL',   pos: null,               count: 3 },
+];
+
+function findTeamByName(name) {
+  const norm = n => n.toLowerCase().trim();
+  // Exact match first
+  let t = teams.find(t => norm(t.name) === norm(name));
+  if (t) return t;
+  // Fuzzy: team contains name or name contains team
+  t = teams.find(t => norm(t.name).includes(norm(name)) || norm(name).includes(norm(t.name)));
+  if (t) return t;
+  // "Team N" shorthand
+  const m = name.match(/(\d+)/);
+  if (m) return teams[parseInt(m[1]) - 1] || null;
+  return null;
+}
+
+function loadKeeperCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    processKeeperText(e.target.result, true);
+    document.getElementById('keeper-csv-status').textContent = `✓ Loaded from ${file.name}`;
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function processKeeperPaste() {
+  const text = document.getElementById('keeper-paste').value;
+  if (!text.trim()) { showToast('Paste some keeper assignments first.'); return; }
+  processKeeperText(text, false);
+}
+
+function processKeeperText(text, isCSV) {
+  if (!players.length) {
+    showToast('Import player rankings first before assigning keepers.');
+    return;
+  }
+
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  // Detect if first line is a header
+  const firstLower = lines[0].toLowerCase();
+  const startIdx = (firstLower.includes('player') || firstLower.includes('name')) ? 1 : 0;
+
+  let assigned = 0, notFound = [], noTeam = [];
+
+  for (let i = startIdx; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+    if (cols.length < 2) continue;
+
+    // Auto-detect column order: if col[0] looks like a team name and col[1] like a player, swap
+    let playerName = cols[0];
+    let teamName   = cols[1];
+
+    const team = findTeamByName(teamName);
+    const p = players.find(pl => normalizeName(pl.name) === normalizeName(playerName));
+
+    if (!p) { notFound.push(playerName); continue; }
+    if (!team) { noTeam.push(`${playerName} → "${teamName}"`); continue; }
+
+    // Remove from old team if re-assigning
+    if (p.takenBy !== null && p.takenBy !== undefined) {
+      teams[p.takenBy].roster = teams[p.takenBy].roster.filter(id => id !== p.id);
+    }
+
+    p.takenBy = team.id;
+    p.isKeeper = true;
+    if (!team.roster.includes(p.id)) team.roster.push(p.id);
+    assigned++;
+  }
+
+  renderTeamsGrid();
+  renderAvailable();
+  renderRankings();
+  renderBestAvail();
+  renderKeeperPreview();
+
+  let msg = `✓ ${assigned} keepers assigned.`;
+  if (notFound.length) msg += ` ${notFound.length} players not found in rankings.`;
+  if (noTeam.length)   msg += ` ${noTeam.length} team names unrecognized.`;
+  showToast(msg);
+
+  if (notFound.length || noTeam.length) {
+    console.warn('Keepers not matched:', notFound);
+    console.warn('Teams not matched:', noTeam);
+  }
+}
+
+function renderKeeperPreview() {
+  const section = document.getElementById('keeper-preview');
+  const inner = document.getElementById('keeper-preview-inner');
+  const keeperTeams = teams.filter(t => t.roster.some(id => players.find(p=>p.id===id&&p.isKeeper)));
+  if (!keeperTeams.length) { section.style.display='none'; return; }
+
+  inner.innerHTML = teams.map(t => {
+    const keepers = t.roster.map(id => players.find(p=>p.id===id&&p.isKeeper)).filter(Boolean);
+    if (!keepers.length) return `<div class="import-card" style="opacity:0.5;"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;">${t.name}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);">No keepers</div></div>`;
+    return `<div class="import-card">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;">
+        ${t.name}<span style="font-family:'IBM Plex Mono',monospace;font-weight:400;color:var(--muted);font-size:0.65rem;">${keepers.length} keepers</span>
+      </div>
+      ${keepers.map(p => `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:0.8rem;">
+        <span class="pos-badge ${getPosColor(p.pos)}" style="font-size:0.55rem;padding:1px 4px;">${p.pos.split('/')[0]}</span>
+        <span style="flex:1">${p.name}</span>
+        <span class="keeper-badge">KEEP</span>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+  section.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════
+// TEAM ROSTERS VIEW
+// ══════════════════════════════════════════════
+function renderTeamRosters() {
+  const grid = document.getElementById('team-roster-grid');
+  if (!grid) return;
+
+  grid.innerHTML = teams.map(t => {
+    const roster = t.roster.map(id => players.find(p => p.id === id)).filter(Boolean);
+
+    // Build slot fills using primary position
+    const slotRows = [];
+    const used = new Set();
+
+    // For each defined slot type, try to fill from roster
+    for (const slotDef of LEAGUE_SLOTS) {
+      for (let si = 0; si < slotDef.count; si++) {
+        const slotLabel = slotDef.count > 1 ? `${slotDef.slot} ${si+1}` : slotDef.slot;
+
+        if (slotDef.pos === null) {
+          // BN/IL — fill with any remaining
+          const filler = slotDef.slot === 'BN'
+            ? roster.filter(p => !used.has(p.id))
+            : []; // IL shown empty unless manually marked
+          const filled = filler[si] || null;
+          if (filled) used.add(filled.id);
+          slotRows.push({ slot: slotLabel, player: filled, isBench: slotDef.slot === 'BN', isIL: slotDef.slot === 'IL' });
+        } else {
+          // Find first unused player whose primary pos fits this slot
+          const match = roster.find(p => {
+            if (used.has(p.id)) return false;
+            const primary = p.pos.split('/')[0];
+            return slotDef.pos.includes(primary);
+          });
+          if (match) used.add(match.id);
+          slotRows.push({ slot: slotLabel, player: match || null, isBench: false, isIL: false });
+        }
+      }
+    }
+
+    const totalSlots = LEAGUE_SLOTS.reduce((s,d) => s+d.count, 0);
+    const filled = slotRows.filter(r => r.player).length;
+    const pct = Math.round((filled / (totalSlots - 13)) * 100); // exclude BN/IL from pct
+    const startingFilled = slotRows.filter(r => !r.isBench && !r.isIL && r.player).length;
+    const startingTotal = LEAGUE_SLOTS.filter(d => d.slot !== 'BN' && d.slot !== 'IL').reduce((s,d)=>s+d.count,0);
+
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);">
+      <div style="background:var(--ink);color:var(--bg);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.06em;text-transform:uppercase;">${t.name}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:#aaa;">${startingFilled}/${startingTotal} starters · ${roster.length} total</span>
+      </div>
+
+      <!-- Fill bar -->
+      <div style="padding:10px 14px 6px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Starter Fill</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:${startingFilled===startingTotal?'var(--green)':'var(--accent)'};">${startingFilled}/${startingTotal}</span>
+        </div>
+        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${Math.round(startingFilled/startingTotal*100)}%;background:${startingFilled===startingTotal?'var(--green)':'var(--accent)'};border-radius:3px;transition:width 0.4s;"></div>
+        </div>
+      </div>
+
+      <!-- Slot table -->
+      <div style="padding:0 14px 12px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tbody>
+            ${slotRows.map(row => {
+              const isBench = row.isBench;
+              const isIL = row.isIL;
+              const isEmpty = !row.player;
+              const bgColor = isBench ? 'rgba(0,0,0,0.02)' : isIL ? 'rgba(200,67,26,0.03)' : isEmpty ? 'rgba(200,67,26,0.04)' : '';
+              const slotColor = isBench ? 'var(--muted)' : isIL ? 'var(--accent)' : 'var(--ink)';
+
+              return `<tr style="border-bottom:1px solid var(--border);background:${bgColor}">
+                <td style="padding:5px 6px 5px 0;width:52px;">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.06em;color:${slotColor};font-weight:500;">${row.slot}</span>
+                </td>
+                <td style="padding:5px 0;">
+                  ${row.player
+                    ? `<div style="display:flex;align-items:center;gap:6px;">
+                        <span class="pos-badge ${getPosColor(row.player.pos)}" style="font-size:0.52rem;padding:1px 4px;">${row.player.pos.split('/')[0]}</span>
+                        <span style="font-size:0.8rem;font-weight:500;">${row.player.name}</span>
+                        ${row.player.isKeeper ? '<span class="keeper-badge">K</span>' : ''}
+                      </div>`
+                    : `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:${isBench||isIL?'var(--border)':'var(--accent)'};letter-spacing:0.06em;">${isBench||isIL?'—':'EMPTY'}</span>`
+                  }
+                </td>
+                <td style="padding:5px 0;text-align:right;width:30px;">
+                  ${row.player ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);">#${row.player.medianRank%1===0?row.player.medianRank:row.player.medianRank.toFixed(1)}</span>` : ''}
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// PROJECTED STATS — CSV IMPORT
+// ══════════════════════════════════════════════
+function loadProjCSV(event, type) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const count = parseProjCSV(e.target.result, type);
+    document.getElementById(`proj-${type}-status`).textContent = `✓ ${count} players matched`;
+    showToast(`${count} ${type === 'bat' ? 'batter' : 'pitcher'} projections loaded`);
+    renderRankings();
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function parseProjCSV(csv, type) {
+  const parseRow = line => {
+    const cols = []; let cur = '', inQ = false;
+    for (const ch of line) {
+      if (ch === '"') inQ = !inQ;
+      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    cols.push(cur.trim());
+    return cols;
+  };
+
+  const lines = csv.trim().split('\n');
+  if (lines.length < 2) return 0;
+  const hdr = parseRow(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9+]/g,''));
+
+  const col = (...keys) => {
+    for (const k of keys) { const i = hdr.findIndex(h => h === k || h.includes(k)); if (i !== -1) return i; }
+    return -1;
+  };
+
+  const nameCol = col('name','playername','player');
+  if (nameCol === -1) return 0;
+
+  // Batter cols: R, HR, RBI, SB, AVG
+  // Pitcher cols: W, SO/K, ERA, WHIP, SV+HLD / SVH
+  const cols = type === 'bat'
+    ? { R: col('r'), HR: col('hr'), RBI: col('rbi'), SB: col('sb'), AVG: col('avg') }
+    : { W: col('w'), K: col('so','k'), ERA: col('era'), WHIP: col('whip'), SVH: col('sv+hld','svh','svhld','svhold') };
+
+  let matched = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const row = parseRow(lines[i].trim());
+    if (!row[nameCol]) continue;
+    const norm = normalizeName(row[nameCol]);
+    if (!projStats[norm]) projStats[norm] = {};
+    for (const [stat, ci] of Object.entries(cols)) {
+      if (ci !== -1 && row[ci] !== undefined) {
+        const v = parseFloat(row[ci]);
+        if (!isNaN(v)) projStats[norm][stat] = v;
+      }
+    }
+    // Only count as matched if player exists in pool
+    if (players.find(p => p.id === norm)) matched++;
+  }
+  return matched;
+}
+
+function fmtStat(val, decimals = 0) {
+  if (val === undefined || val === null) return '<span style="color:var(--border)">—</span>';
+  return decimals > 0 ? val.toFixed(decimals) : Math.round(val);
+}
+
+// ══════════════════════════════════════════════
+// PLAYER NOTES
+// ══════════════════════════════════════════════
+let activeNoteId = null;
+
+function openNote(playerId, name) {
+  activeNoteId = playerId;
+  const existing = playerNotes[playerId] || '';
+  // Simple inline modal
+  const overlay = document.createElement('div');
+  overlay.id = 'note-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:24px;width:400px;box-shadow:var(--shadow-lg);">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">${name}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:14px;">SCOUTING NOTE</div>
+      <textarea id="note-text" style="width:100%;min-height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:10px;font-family:'Barlow',sans-serif;font-size:0.88rem;color:var(--ink);outline:none;resize:vertical;">${existing}</textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;justify-content:flex-end;">
+        <button onclick="closeNote(false)" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:8px 16px;background:none;border:1px solid var(--border);border-radius:3px;cursor:pointer;">Cancel</button>
+        <button onclick="closeNote(true)" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:8px 16px;background:var(--ink);color:var(--bg);border:none;border-radius:3px;cursor:pointer;">Save Note</button>
+        ${existing ? `<button onclick="deleteNote()" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:white;border:none;border-radius:3px;cursor:pointer;">Delete</button>` : ''}
+      </div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeNote(false); });
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('note-text')?.focus(), 50);
+}
+
+function closeNote(save) {
+  if (save && activeNoteId) {
+    const text = document.getElementById('note-text')?.value.trim();
+    if (text) playerNotes[activeNoteId] = text;
+    else delete playerNotes[activeNoteId];
+    renderRankings();
+  }
+  document.getElementById('note-overlay')?.remove();
+  activeNoteId = null;
+}
+
+function deleteNote() {
+  delete playerNotes[activeNoteId];
+  document.getElementById('note-overlay')?.remove();
+  activeNoteId = null;
+  renderRankings();
+}
+
+// ══════════════════════════════════════════════
+// NEEDS ANALYSIS
+// ══════════════════════════════════════════════
+function updateNeedsBar() {
+  const bar = document.getElementById('needs-bar');
+  const pills = document.getElementById('needs-pills');
+  if (!bar || !pills) return;
+
+  const clockTeamId = parseInt(document.getElementById('clock-team')?.value);
+  if (isNaN(clockTeamId)) { bar.style.display = 'none'; return; }
+
+  const team = teams[clockTeamId];
+  if (!team) { bar.style.display = 'none'; return; }
+
+  // Build filled positions for this team (primary pos only)
+  const roster = team.roster.map(id => players.find(p => p.id === id)).filter(Boolean);
+  const filledPos = {};
+  roster.forEach(p => {
+    const primary = p.pos.split('/')[0];
+    filledPos[primary] = (filledPos[primary] || 0) + 1;
+  });
+
+  // Compare against league slots (exclude BN/IL)
+  const needs = [];
+  for (const slotDef of LEAGUE_SLOTS) {
+    if (!slotDef.pos) continue; // skip BN/IL
+    const mainPos = slotDef.slot.replace(/\s*\d+$/, '');
+    // count how many of this slot's eligible positions are filled
+    const eligible = slotDef.pos.reduce((sum, pos) => sum + (filledPos[pos] || 0), 0);
+    const needed = slotDef.count - Math.min(eligible, slotDef.count);
+    if (needed > 0) {
+      needs.push({ slot: mainPos, needed });
+    }
+  }
+
+  if (!needs.length) {
+    pills.innerHTML = '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:0.68rem;color:var(--green);">✓ All starter slots filled</span>';
+  } else {
+    pills.innerHTML = needs.map(n => {
+      const urgency = n.needed >= 2 ? 'var(--accent)' : 'var(--ink)';
+      return `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.06em;padding:3px 8px;border-radius:12px;background:${urgency};color:white;font-weight:500;">${n.slot}${n.needed > 1 ? ' ×'+n.needed : ''}</span>`;
+    }).join('');
+  }
+
+  bar.style.display = 'flex';
+}
+
+// ══════════════════════════════════════════════
+// DRAFT PICK TRACKER
+// ══════════════════════════════════════════════
+function initPicksUI() {
+  ['pk-from','pk-to'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  });
+
+  const filter = document.getElementById('picks-team-filter');
+  if (filter) {
+    filter.innerHTML = ['ALL', ...teams.map(t => t.name)].map((n, i) =>
+      `<button class="pos-pill ${i===0?'active':''}" onclick="filterPicks(${i===0?-1:i-1}, this)">${i===0?'All Teams':n}</button>`
+    ).join('');
+  }
+}
+
+let picksTeamFilter = -1;
+
+function filterPicks(teamId, el) {
+  picksTeamFilter = teamId;
+  document.querySelectorAll('#picks-team-filter .pos-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderPicksBoard();
+}
+
+function addPick() {
+  const round = parseInt(document.getElementById('pk-round').value);
+  const year  = parseInt(document.getElementById('pk-year').value);
+  const from  = parseInt(document.getElementById('pk-from').value);
+  const to    = parseInt(document.getElementById('pk-to').value);
+  const note  = document.getElementById('pk-note').value.trim();
+
+  draftPicks.push({ id: Date.now(), round, year, fromTeamId: from, toTeamId: to, note });
+  draftPicks.sort((a,b) => a.year - b.year || a.round - b.round);
+
+  document.getElementById('pk-note').value = '';
+  renderPicksBoard();
+  showToast(`Pick added: ${year} Round ${round}`);
+}
+
+function removePick(id) {
+  draftPicks = draftPicks.filter(p => p.id !== id);
+  renderPicksBoard();
+}
+
+function renderPicksBoard() {
+  const board = document.getElementById('picks-board');
+  if (!board) return;
+
+  const filtered = picksTeamFilter === -1
+    ? draftPicks
+    : draftPicks.filter(p => p.toTeamId === picksTeamFilter || p.fromTeamId === picksTeamFilter);
+
+  if (!filtered.length) {
+    board.innerHTML = '<div style="text-align:center;padding:40px;font-family:\'IBM Plex Mono\',monospace;font-size:0.75rem;color:var(--muted);">No picks logged yet. Use the form above to add picks.</div>';
+    return;
+  }
+
+  // Group by year
+  const byYear = {};
+  filtered.forEach(p => { (byYear[p.year] = byYear[p.year] || []).push(p); });
+
+  board.innerHTML = Object.entries(byYear).map(([year, picks]) => `
+    <div style="margin-bottom:20px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--border);">${year} Draft Picks</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
+        ${picks.map(pk => {
+          const fromTeam = teams[pk.fromTeamId]?.name || '?';
+          const toTeam   = teams[pk.toTeamId]?.name   || '?';
+          const traded   = pk.fromTeamId !== pk.toTeamId;
+          return `<div style="background:var(--surface);border:1px solid ${traded?'var(--gold)':'var(--border)'};border-radius:4px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+            <div style="background:var(--ink);color:var(--bg);border-radius:3px;padding:6px 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.06em;white-space:nowrap;">Rd ${pk.round}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:500;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${toTeam}</div>
+              ${traded ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--gold);">via ${fromTeam}</div>` : ''}
+              ${pk.note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pk.note}</div>` : ''}
+            </div>
+            <button onclick="removePick(${pk.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;padding:2px 5px;border-radius:2px;flex-shrink:0;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// WATCHLIST
+// ══════════════════════════════════════════════
+let watchlist = {}; // { playerId: 'high'|'mid'|'low' }
+
+const WL_PRIORITIES = ['high', 'mid', 'low'];
+const WL_LABELS = { high: 'Must Draft', mid: 'Targeting', low: 'Late Round' };
+
+function renderWatchlistSearch() {
+  const q = document.getElementById('wl-search').value.trim().toLowerCase();
+  const results = document.getElementById('wl-search-results');
+  if (!q || q.length < 2) { results.style.display = 'none'; return; }
+
+  const matches = players.filter(p =>
+    p.name.toLowerCase().includes(q) && !watchlist[p.id]
+  ).slice(0, 8);
+
+  if (!matches.length) { results.style.display = 'none'; return; }
+
+  results.style.display = 'block';
+  results.innerHTML = matches.map(p => `
+    <div onclick="addToWatchlist('${p.id}','mid')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+      <span class="pos-badge ${getPosColor(p.pos)}" style="font-size:0.55rem;padding:1px 4px;">${p.pos.split('/')[0]}</span>
+      <span style="font-weight:500;flex:1;">${p.name}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);">${p.team_abbr} · #${p.medianRank}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;padding:2px 6px;border-radius:2px;background:var(--ink);color:var(--bg);">+ Add</span>
+    </div>`).join('');
+}
+
+function addToWatchlist(playerId, priority) {
+  watchlist[playerId] = priority;
+  document.getElementById('wl-search').value = '';
+  document.getElementById('wl-search-results').style.display = 'none';
+  renderWatchlist();
+}
+
+function removeFromWatchlist(playerId) {
+  delete watchlist[playerId];
+  renderWatchlist();
+}
+
+function moveWatchlistPlayer(playerId, direction) {
+  const current = watchlist[playerId];
+  const idx = WL_PRIORITIES.indexOf(current);
+  const newIdx = Math.max(0, Math.min(WL_PRIORITIES.length - 1, idx + direction));
+  watchlist[playerId] = WL_PRIORITIES[newIdx];
+  renderWatchlist();
+}
+
+function renderWatchlist() {
+  WL_PRIORITIES.forEach(priority => {
+    const col = document.getElementById(`wl-${priority}`);
+    if (!col) return;
+
+    const ids = Object.entries(watchlist)
+      .filter(([,p]) => p === priority)
+      .map(([id]) => id);
+
+    if (!ids.length) {
+      col.innerHTML = `<div style="text-align:center;padding:20px 8px;font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--border);letter-spacing:0.08em;text-transform:uppercase;">Empty</div>`;
+      return;
+    }
+
+    col.innerHTML = ids.map(id => {
+      const p = players.find(x => x.id === id);
+      if (!p) return '';
+      const taken = p.takenBy !== null;
+      const takenBy = taken ? teams[p.takenBy]?.name : null;
+      const st = projStats[id] || {};
+      const isPit = ['SP','RP'].includes(p.pos.split('/')[0]);
+      const note = playerNotes[id];
+
+      // Show key stat line if projections available
+      let statLine = '';
+      if (Object.keys(st).length) {
+        if (!isPit) statLine = `${st.HR ?? '—'}HR · ${st.RBI ?? '—'}RBI · ${st.SB ?? '—'}SB · .${st.AVG ? (st.AVG*1000|0).toString().padStart(3,'0') : '—'}`;
+        else statLine = `${st.W ?? '—'}W · ${st.K ?? '—'}K · ${st.ERA?.toFixed(2) ?? '—'}ERA · ${st.SVH ?? '—'}SVH`;
+      }
+
+      return `<div style="background:${taken?'var(--surface2)':'var(--surface)'};border:1px solid var(--border);border-radius:3px;padding:7px 9px;margin-bottom:4px;opacity:${taken?0.45:1};transition:opacity 0.2s;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="pos-badge ${getPosColor(p.pos)}" style="font-size:0.52rem;padding:1px 4px;">${p.pos.split('/')[0]}</span>
+          <span style="font-weight:500;font-size:0.83rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--muted);">#${p.medianRank}</span>
+        </div>
+        ${taken ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--accent);margin-top:2px;">DRAFTED · ${takenBy}</div>` : ''}
+        ${statLine ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${statLine}</div>` : ''}
+        ${note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--gold);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📝 ${note.slice(0,50)}</div>` : ''}
+        <div style="display:flex;gap:4px;margin-top:5px;">
+          <button onclick="moveWatchlistPlayer('${id}',-1)" title="Move up" style="font-size:0.65rem;padding:2px 6px;background:none;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--muted);" ${WL_PRIORITIES.indexOf(priority)===0?'disabled style="opacity:0.3"':''}>↑</button>
+          <button onclick="moveWatchlistPlayer('${id}',1)" title="Move down" style="font-size:0.65rem;padding:2px 6px;background:none;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--muted);" ${WL_PRIORITIES.indexOf(priority)===WL_PRIORITIES.length-1?'disabled style="opacity:0.3"':''}>↓</button>
+          <span style="flex:1"></span>
+          <button onclick="openNote('${id}','${p.name.replace(/'/g,"\\'")}')
+          " title="Note" style="font-size:0.65rem;padding:2px 6px;background:${note?'rgba(184,134,11,0.12)':'none'};border:1px solid ${note?'rgba(184,134,11,0.3)':'var(--border)'};border-radius:2px;cursor:pointer;color:${note?'var(--gold)':'var(--muted)'};">📝</button>
+          <button onclick="removeFromWatchlist('${id}')" style="font-size:0.65rem;padding:2px 6px;background:none;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--muted);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+// Also add watchlist star to rankings table rows — call this from renderRankings
+function isWatched(playerId) { return !!watchlist[playerId]; }
+
+function toggleWatch(playerId) {
+  if (watchlist[playerId]) removeFromWatchlist(playerId);
+  else addToWatchlist(playerId, 'mid');
+  renderRankings(); // refresh star states
+}
+
+// ══════════════════════════════════════════════
+// CATEGORY STRENGTH RATING
+// ══════════════════════════════════════════════
+const BAT_CATS = ['R','HR','RBI','SB','AVG'];
+const PIT_CATS = ['W','K','ERA','WHIP','SVH'];
+// For ERA and WHIP, lower = better — invert score
+const LOWER_IS_BETTER = new Set(['ERA','WHIP']);
+
+function computeCatRatings() {
+  // For each team, sum projected stats across their roster
+  const teamTotals = teams.map(t => {
+    const roster = t.roster.map(id => players.find(p=>p.id===id)).filter(Boolean);
+    const totals = {};
+    const allCats = [...BAT_CATS, ...PIT_CATS];
+    allCats.forEach(cat => { totals[cat] = null; });
+
+    // Batting: sum R, HR, RBI, SB; weighted avg for AVG
+    let totalAB = 0, totalHits = 0;
+    roster.forEach(p => {
+      const st = projStats[p.id] || {};
+      const isPit = ['SP','RP'].includes(p.pos.split('/')[0]);
+      if (!isPit) {
+        if (st.R   != null) totals.R   = (totals.R  ??0) + st.R;
+        if (st.HR  != null) totals.HR  = (totals.HR ??0) + st.HR;
+        if (st.RBI != null) totals.RBI = (totals.RBI??0) + st.RBI;
+        if (st.SB  != null) totals.SB  = (totals.SB ??0) + st.SB;
+        // estimate AB from AVG (assume ~450 AB per full-time batter)
+        if (st.AVG != null) { const ab = 450; totalAB += ab; totalHits += st.AVG * ab; }
+      } else {
+        if (st.W   != null) totals.W   = (totals.W  ??0) + st.W;
+        if (st.K   != null) totals.K   = (totals.K  ??0) + st.K;
+        if (st.SVH != null) totals.SVH = (totals.SVH??0) + st.SVH;
+        // ERA/WHIP: weighted by innings (assume 180 IP per SP, 65 per RP)
+        if (st.ERA != null) {
+          const ip = p.pos.split('/')[0]==='SP' ? 180 : 65;
+          totals._eraRuns = (totals._eraRuns||0) + st.ERA * ip / 9;
+          totals._eraIP   = (totals._eraIP  ||0) + ip;
+        }
+        if (st.WHIP != null) {
+          const ip = p.pos.split('/')[0]==='SP' ? 180 : 65;
+          totals._whipBB  = (totals._whipBB ||0) + st.WHIP * ip;
+          totals._whipIP  = (totals._whipIP ||0) + ip;
+        }
+      }
+    });
+
+    if (totalAB > 0) totals.AVG = totalHits / totalAB;
+    if (totals._eraIP)  totals.ERA  = totals._eraRuns  * 9 / totals._eraIP;
+    if (totals._whipIP) totals.WHIP = totals._whipBB   / totals._whipIP;
+
+    return { team: t, totals };
+  });
+
+  // Normalize each category 0–100 relative to league
+  const allCats = [...BAT_CATS, ...PIT_CATS];
+  const scores = teamTotals.map(tt => ({ team: tt.team, totals: tt.totals, scores: {} }));
+
+  allCats.forEach(cat => {
+    const vals = scores.map(s => s.totals[cat]).filter(v => v != null);
+    if (!vals.length) return;
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const range = max - min || 1;
+    scores.forEach(s => {
+      const v = s.totals[cat];
+      if (v == null) { s.scores[cat] = null; return; }
+      const normalized = (v - min) / range * 100;
+      s.scores[cat] = LOWER_IS_BETTER.has(cat) ? 100 - normalized : normalized;
+    });
+  });
+
+  // Overall score = mean of all available cat scores
+  scores.forEach(s => {
+    const vals = allCats.map(c => s.scores[c]).filter(v => v != null);
+    s.overall = vals.length ? vals.reduce((a,b)=>a+b,0) / vals.length : null;
+  });
+
+  return scores.sort((a,b) => (b.overall??-1) - (a.overall??-1));
+}
+
+function scoreColor(score) {
+  if (score == null) return 'var(--muted)';
+  if (score >= 75) return 'var(--green)';
+  if (score >= 50) return '#b8860b';
+  if (score >= 25) return '#e85c30';
+  return 'var(--accent)';
+}
+
+function scoreBar(score, cat) {
+  if (score == null) return '<span style="color:var(--border);font-family:\'IBM Plex Mono\',monospace;font-size:0.65rem;">—</span>';
+  const color = scoreColor(score);
+  const label = LOWER_IS_BETTER.has(cat) ? `${score.toFixed(0)}` : `${score.toFixed(0)}`;
+  return `<div style="display:flex;align-items:center;gap:5px;">
+    <div style="width:48px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;flex-shrink:0;">
+      <div style="width:${score}%;height:100%;background:${color};border-radius:3px;"></div>
+    </div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:${color};font-weight:500;">${label}</span>
+  </div>`;
+}
+
+function renderCatRating() {
+  const hasStats = Object.keys(projStats).length > 0;
+  document.getElementById('catrating-no-stats').style.display = hasStats ? 'none' : 'block';
+  document.getElementById('catrating-content').style.display = hasStats ? 'block' : 'none';
+  if (!hasStats) return;
+
+  const ratings = computeCatRatings();
+
+  // Build batting table
+  const batHeader = document.getElementById('cat-bat-header');
+  const batBody   = document.getElementById('cat-bat-body');
+  const pitHeader = document.getElementById('cat-pit-header');
+  const pitBody   = document.getElementById('cat-pit-body');
+
+  const thStyle = `style="padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border);text-align:left;"`;
+  const tdStyle = `style="padding:8px 12px;border-bottom:1px solid var(--border);"`;
+
+  batHeader.innerHTML = `<th ${thStyle}>Team</th>` + BAT_CATS.map(c=>`<th ${thStyle}>${c}</th>`).join('') + `<th ${thStyle}>Bat Score</th>`;
+  pitHeader.innerHTML = `<th ${thStyle}>Team</th>` + PIT_CATS.map(c=>`<th ${thStyle}>${c}</th>`).join('') + `<th ${thStyle}>Pit Score</th>`;
+
+  batBody.innerHTML = ratings.map((r,i) => {
+    const batScore = BAT_CATS.map(c=>r.scores[c]).filter(v=>v!=null);
+    const batAvg = batScore.length ? batScore.reduce((a,b)=>a+b)/batScore.length : null;
+    return `<tr style="${i%2===0?'':'background:var(--surface2)'}">
+      <td ${tdStyle} style="padding:8px 12px;font-weight:500;font-size:0.85rem;border-bottom:1px solid var(--border);">${r.team.name}</td>
+      ${BAT_CATS.map(c=>`<td ${tdStyle}>${scoreBar(r.scores[c],c)}</td>`).join('')}
+      <td ${tdStyle}>${scoreBar(batAvg,'BAT')}</td>
+    </tr>`;
+  }).join('');
+
+  pitBody.innerHTML = ratings.map((r,i) => {
+    const pitScore = PIT_CATS.map(c=>r.scores[c]).filter(v=>v!=null);
+    const pitAvg = pitScore.length ? pitScore.reduce((a,b)=>a+b)/pitScore.length : null;
+    return `<tr style="${i%2===0?'':'background:var(--surface2)'}">
+      <td ${tdStyle} style="padding:8px 12px;font-weight:500;font-size:0.85rem;border-bottom:1px solid var(--border);">${r.team.name}</td>
+      ${PIT_CATS.map(c=>`<td ${tdStyle}>${scoreBar(r.scores[c],c)}</td>`).join('')}
+      <td ${tdStyle}>${scoreBar(pitAvg,'PIT')}</td>
+    </tr>`;
+  }).join('');
+
+  // Overall cards
+  document.getElementById('cat-overall').innerHTML = ratings.map((r, rank) => {
+    const score = r.overall;
+    const medals = ['🥇','🥈','🥉'];
+    const medal = medals[rank] || `${rank+1}.`;
+    const allScores = [...BAT_CATS,...PIT_CATS].map(c=>({ cat:c, score:r.scores[c] })).filter(x=>x.score!=null).sort((a,b)=>b.score-a.score);
+    const best3  = allScores.slice(0,3).map(x=>x.cat).join(', ');
+    const worst3 = allScores.slice(-3).reverse().map(x=>x.cat).join(', ');
+
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);">
+      <div style="background:var(--ink);color:var(--bg);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.06em;text-transform:uppercase;">${medal} ${r.team.name}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:${scoreColor(score)};font-weight:500;">${score != null ? score.toFixed(1) : '—'}</span>
+      </div>
+      <div style="padding:10px 12px;">
+        <div style="margin-bottom:6px;">
+          <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${score??0}%;background:${scoreColor(score)};border-radius:4px;transition:width 0.5s;"></div>
+          </div>
+        </div>
+        ${allScores.length ? `
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;margin-top:8px;">
+          <div style="color:var(--green);margin-bottom:2px;">▲ ${best3}</div>
+          <div style="color:var(--accent);">▼ ${worst3}</div>
+        </div>` : '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.62rem;color:var(--muted);">No projections loaded</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+updatePickCounter();
+</script>
+</body>
+</html>

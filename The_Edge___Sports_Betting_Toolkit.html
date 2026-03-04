@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Edge — Sports Betting Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: #2a2a3a;
+    --accent: #c8f135;
+    --accent2: #35f1c8;
+    --red: #f13560;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --win: #c8f135;
+    --loss: #f13560;
+    --push: #f1a835;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .logo span { color: var(--text); }
+
+  .tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-left: 1px solid var(--border);
+    padding-left: 16px;
+    margin-left: 4px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 32px;
+  }
+
+  .tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 14px 22px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .panel { display: none; padding: 32px; }
+  .panel.active { display: block; }
+
+  /* ─── ODDS CALCULATOR ─── */
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 900px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  input, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--surface2); }
+
+  button {
+    margin-top: 18px;
+    width: 100%;
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 3px;
+    padding: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  button:hover { opacity: 0.88; }
+  button:active { transform: scale(0.98); }
+
+  .result-box {
+    margin-top: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px;
+    display: none;
+  }
+
+  .result-box.show { display: block; }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .result-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .result-row .key { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; }
+  .result-row .val { font-weight: 500; }
+  .result-row .val.pos { color: var(--win); }
+  .result-row .val.neg { color: var(--loss); }
+  .result-row .val.neutral { color: var(--accent2); }
+
+  /* EV highlight */
+  .ev-bar {
+    margin-top: 12px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .ev-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* ─── BET TRACKER ─── */
+  .tracker-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 18px 20px;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.9rem;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .stat-value.pos { color: var(--win); }
+  .stat-value.neg { color: var(--loss); }
+  .stat-value.neutral { color: var(--accent2); }
+
+  .add-bet-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .form-row button {
+    margin-top: 0;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .bets-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  td {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(200, 241, 53, 0.03); }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+
+  .badge.win { background: rgba(200,241,53,0.15); color: var(--win); }
+  .badge.loss { background: rgba(241,53,96,0.15); color: var(--loss); }
+  .badge.push { background: rgba(241,168,53,0.15); color: var(--push); }
+  .badge.pending { background: rgba(107,107,128,0.2); color: var(--muted); }
+
+  .del-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+    width: auto;
+    margin-top: 0;
+    border-radius: 2px;
+  }
+
+  .del-btn:hover { border-color: var(--loss); color: var(--loss); }
+
+  /* ─── BANKROLL ─── */
+  .bankroll-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 900px;
+  }
+
+  .kelly-result {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    display: none;
+  }
+
+  .kelly-result.show { display: block; }
+
+  .kelly-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .kelly-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.08em;
+  }
+
+  .risk-meter {
+    margin-top: 16px;
+  }
+
+  .risk-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .risk-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .risk-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s, background 0.4s;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in { animation: fadeIn 0.3s ease forwards; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">The<span> Edge</span></div>
+  <div class="tagline">Sports Betting Toolkit · Built to learn with</div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <button onclick="exportData()" style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);padding:6px 14px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↓ Save</button>
+    <label style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);padding:6px 14px;cursor:pointer;transition:all 0.15s;margin:0;" onmouseover="this.style.borderColor='var(--accent2,#35f1c8)';this.style.color='var(--accent2,#35f1c8)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↑ Load<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('odds')">Odds Calculator</button>
+  <button class="tab" onclick="switchTab('tracker')">Bet Tracker</button>
+  <button class="tab" onclick="switchTab('bankroll')">Bankroll Manager</button>
+</div>
+
+<!-- ══════════════ ODDS CALCULATOR ══════════════ -->
+<div id="panel-odds" class="panel active">
+  <div class="calc-grid">
+
+    <!-- Converter -->
+    <div class="card">
+      <div class="card-title">Odds Converter</div>
+      <label>Odds Format</label>
+      <select id="oddsFormat" onchange="convertOdds()">
+        <option value="american">American (e.g. -110, +150)</option>
+        <option value="decimal">Decimal (e.g. 1.91, 2.50)</option>
+        <option value="fractional">Fractional (e.g. 10/11)</option>
+      </select>
+      <label>Enter Odds</label>
+      <input id="oddsInput" type="text" placeholder="-110" oninput="convertOdds()">
+      <div class="result-box show" id="convertResult">
+        <div class="result-row"><span class="key">American</span><span class="val neutral" id="r-american">—</span></div>
+        <div class="result-row"><span class="key">Decimal</span><span class="val neutral" id="r-decimal">—</span></div>
+        <div class="result-row"><span class="key">Fractional</span><span class="val neutral" id="r-fractional">—</span></div>
+        <div class="result-row"><span class="key">Implied Probability</span><span class="val neutral" id="r-implied">—</span></div>
+      </div>
+    </div>
+
+    <!-- Payout Calculator -->
+    <div class="card">
+      <div class="card-title">Payout Calculator</div>
+      <label>American Odds</label>
+      <input id="payOdds" type="number" placeholder="-110" oninput="calcPayout()">
+      <label>Wager ($)</label>
+      <input id="payWager" type="number" placeholder="100" oninput="calcPayout()">
+      <div class="result-box" id="payResult">
+        <div class="result-row"><span class="key">To Win</span><span class="val pos" id="p-win">—</span></div>
+        <div class="result-row"><span class="key">Total Payout</span><span class="val pos" id="p-total">—</span></div>
+        <div class="result-row"><span class="key">Implied Win %</span><span class="val neutral" id="p-implied">—</span></div>
+      </div>
+    </div>
+
+    <!-- EV Calculator -->
+    <div class="card">
+      <div class="card-title">Expected Value (EV)</div>
+      <label>Your Book Odds (American)</label>
+      <input id="evBook" type="number" placeholder="-110">
+      <label style="margin-top:12px;color:var(--accent2)">Comparison Books (for true probability)</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px;">
+        <div>
+          <label style="margin-top:0">Book 2</label>
+          <input id="evBook2" type="number" placeholder="-105">
+        </div>
+        <div>
+          <label style="margin-top:0">Book 3</label>
+          <input id="evBook3" type="number" placeholder="-108">
+        </div>
+        <div>
+          <label style="margin-top:0">Book 4</label>
+          <input id="evBook4" type="number" placeholder="-112">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div>
+          <label>Wager ($)</label>
+          <input id="evWager" type="number" placeholder="100">
+        </div>
+        <div>
+          <label>Unit Size ($)</label>
+          <input id="evUnit" type="number" placeholder="20" value="20">
+        </div>
+      </div>
+      <button onclick="calcEV()">Calculate EV</button>
+      <div class="result-box" id="evResult">
+        <div class="result-row"><span class="key">No-vig True Probability</span><span class="val neutral" id="ev-trueprob">—</span></div>
+        <div class="result-row"><span class="key">Expected Value</span><span class="val" id="ev-val">—</span></div>
+        <div class="result-row"><span class="key">EV per $100</span><span class="val" id="ev-per100">—</span></div>
+        <div class="result-row"><span class="key">Verdict</span><span class="val" id="ev-verdict">—</span></div>
+        <div class="ev-bar" style="margin-bottom:10px"><div class="ev-fill" id="ev-fill"></div></div>
+        <div class="result-row" style="background:rgba(200,241,53,0.06);padding:8px;border-radius:3px;margin-top:4px;">
+          <span class="key" style="color:var(--accent)">¼ Kelly Rec.</span>
+          <span class="val pos" id="ev-kelly">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parlay Calculator -->
+    <div class="card">
+      <div class="card-title">Parlay Calculator</div>
+      <label>Legs (American odds, one per line)</label>
+      <textarea id="parlayLegs" rows="4" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.85rem;outline:none;resize:vertical;" placeholder="-110&#10;+130&#10;-115"></textarea>
+      <label>Wager ($)</label>
+      <input id="parlayWager" type="number" placeholder="20">
+      <button onclick="calcParlay()">Calculate Parlay</button>
+      <div class="result-box" id="parlayResult">
+        <div class="result-row"><span class="key">American Odds</span><span class="val neutral" id="pl-american">—</span></div>
+        <div class="result-row"><span class="key">Decimal Odds</span><span class="val neutral" id="pl-dec">—</span></div>
+        <div class="result-row"><span class="key">To Win</span><span class="val pos" id="pl-win">—</span></div>
+        <div class="result-row"><span class="key">Total Payout</span><span class="val pos" id="pl-total">—</span></div>
+        <div class="result-row"><span class="key">True Probability</span><span class="val neutral" id="pl-prob">—</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════ BET TRACKER ══════════════ -->
+<div id="panel-tracker" class="panel">
+
+  <div class="tracker-top">
+    <div class="stat-card">
+      <div class="stat-label">Total Wagered</div>
+      <div class="stat-value neutral" id="st-wagered">$0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Net P&L</div>
+      <div class="stat-value" id="st-pnl">$0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Win Rate</div>
+      <div class="stat-value neutral" id="st-winrate">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">ROI</div>
+      <div class="stat-value neutral" id="st-roi">—</div>
+    </div>
+  </div>
+
+  <div class="add-bet-form">
+    <div class="card-title">Log a Bet</div>
+    <div class="form-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr;">
+      <div>
+        <label>Game / Description</label>
+        <input id="bet-desc" type="text" placeholder="Chiefs -3.5 vs Ravens">
+      </div>
+      <div>
+        <label>Odds</label>
+        <input id="bet-odds" type="number" placeholder="-110">
+      </div>
+      <div>
+        <label>Wager ($)</label>
+        <input id="bet-wager" type="number" placeholder="50">
+      </div>
+      <div>
+        <label>Book</label>
+        <input id="bet-book" type="text" placeholder="DraftKings">
+      </div>
+      <div>
+        <label>Tag</label>
+        <input id="bet-tag" type="text" placeholder="NBA system">
+      </div>
+      <div>
+        <label>Result</label>
+        <select id="bet-result">
+          <option value="pending">Pending</option>
+          <option value="win">Win</option>
+          <option value="loss">Loss</option>
+          <option value="push">Push</option>
+        </select>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button onclick="addBet()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bets-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Game / Description</th>
+          <th>Odds</th>
+          <th>Wager</th>
+          <th>To Win</th>
+          <th>Book</th>
+          <th>Tag</th>
+          <th>Result</th>
+          <th>P&L</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="bets-body">
+        <tr><td colspan="9"><div class="empty-state">No bets logged yet. Add one above.</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Performance by Tag chart -->
+  <div id="tag-chart-section" style="display:none;margin-top:28px;">
+    <div class="card" style="max-width:100%">
+      <div class="card-title" style="margin-bottom:20px;">Performance by Tag</div>
+      <div id="tag-chart-bars"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ BANKROLL ══════════════ -->
+<div id="panel-bankroll" class="panel">
+  <div class="bankroll-grid">
+
+    <div class="card">
+      <div class="card-title">Kelly Criterion Bet Sizing</div>
+      <label>Your Bankroll ($)</label>
+      <input id="k-bankroll" type="number" placeholder="1000">
+      <label>Book Odds (American)</label>
+      <input id="k-odds" type="number" placeholder="-110">
+      <label style="color:var(--accent2)">Comparison Books (derive true probability)</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px;">
+        <div>
+          <label style="margin-top:0">Book 2</label>
+          <input id="k-book2" type="number" placeholder="-108">
+        </div>
+        <div>
+          <label style="margin-top:0">Book 3</label>
+          <input id="k-book3" type="number" placeholder="-112">
+        </div>
+        <div>
+          <label style="margin-top:0">Book 4</label>
+          <input id="k-book4" type="number" placeholder="-105">
+        </div>
+      </div>
+      <label>Kelly Fraction</label>
+      <select id="k-fraction">
+        <option value="1">Full Kelly (aggressive)</option>
+        <option value="0.5" selected>Half Kelly (recommended)</option>
+        <option value="0.25">Quarter Kelly (conservative)</option>
+      </select>
+      <button onclick="calcKelly()">Calculate Bet Size</button>
+      <div class="kelly-result" id="kellyResult">
+        <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);margin-bottom:8px;" id="k-trueprob-line">True prob: —</div>
+        <div class="kelly-amount" id="k-amount">$0</div>
+        <div class="kelly-sub" id="k-pct">— of bankroll</div>
+        <div class="risk-meter" style="margin-top:14px;">
+          <div class="risk-label"><span>Risk Level</span><span id="k-risk-label">—</span></div>
+          <div class="risk-track"><div class="risk-fill" id="k-risk-fill"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Break-Even Analysis</div>
+      <label>Vig / Juice Odds (American)</label>
+      <input id="be-odds" type="number" placeholder="-110">
+      <button onclick="calcBreakEven()" style="margin-top:18px;">Calculate Break-Even</button>
+      <div class="result-box" id="beResult">
+        <div class="result-row"><span class="key">Break-Even Win %</span><span class="val neutral" id="be-pct">—</span></div>
+        <div class="result-row"><span class="key">Vig / House Edge</span><span class="val neg" id="be-vig">—</span></div>
+        <div class="result-row"><span class="key">To be profitable, you need to win more than...</span><span class="val pos" id="be-need">—</span></div>
+      </div>
+
+      <div style="margin-top: 28px;">
+        <div class="card-title" style="margin-bottom:14px;">Quick Reference: Common Lines</div>
+        <div id="quick-ref"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// DATA STORE
+// ═══════════════════════════════════
+let bets = [];
+
+// ═══════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ═══════════════════════════════════
+// MATH HELPERS
+// ═══════════════════════════════════
+
+// Convert American odds to decimal
+function americanToDecimal(american) {
+  american = parseFloat(american);
+  if (american > 0) return (american / 100) + 1;
+  return (100 / Math.abs(american)) + 1;
+}
+
+// Convert decimal to American
+function decimalToAmerican(dec) {
+  if (dec >= 2) return '+' + Math.round((dec - 1) * 100);
+  return Math.round(-100 / (dec - 1)).toString();
+}
+
+// Implied probability from American odds
+function impliedProb(american) {
+  american = parseFloat(american);
+  if (american > 0) return 100 / (american + 100);
+  return Math.abs(american) / (Math.abs(american) + 100);
+}
+
+// ═══════════════════════════════════
+// ODDS CONVERTER
+// ═══════════════════════════════════
+function convertOdds() {
+  const fmt = document.getElementById('oddsFormat').value;
+  const raw = document.getElementById('oddsInput').value.trim();
+  if (!raw) return;
+
+  let dec;
+
+  try {
+    if (fmt === 'american') {
+      dec = americanToDecimal(raw);
+    } else if (fmt === 'decimal') {
+      dec = parseFloat(raw);
+    } else {
+      // fractional e.g. "10/11"
+      const parts = raw.split('/');
+      dec = (parseFloat(parts[0]) / parseFloat(parts[1])) + 1;
+    }
+
+    if (isNaN(dec) || dec <= 1) { resetConverter(); return; }
+
+    const american = decimalToAmerican(dec);
+    const frac = decToFrac(dec);
+    const prob = ((1 / dec) * 100).toFixed(1);
+
+    document.getElementById('r-american').textContent = american;
+    document.getElementById('r-decimal').textContent = dec.toFixed(3);
+    document.getElementById('r-fractional').textContent = frac;
+    document.getElementById('r-implied').textContent = prob + '%';
+  } catch(e) { resetConverter(); }
+}
+
+function resetConverter() {
+  ['r-american','r-decimal','r-fractional','r-implied'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
+}
+
+function decToFrac(dec) {
+  const n = dec - 1;
+  // Simple approximation
+  const denom = 100;
+  const num = Math.round(n * denom);
+  const g = gcd(num, denom);
+  return (num/g) + '/' + (denom/g);
+}
+
+function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+
+// ═══════════════════════════════════
+// PAYOUT CALCULATOR
+// ═══════════════════════════════════
+function calcPayout() {
+  const odds = parseFloat(document.getElementById('payOdds').value);
+  const wager = parseFloat(document.getElementById('payWager').value);
+  if (isNaN(odds) || isNaN(wager) || wager <= 0) return;
+
+  const dec = americanToDecimal(odds);
+  const toWin = (dec - 1) * wager;
+  const total = dec * wager;
+  const prob = impliedProb(odds) * 100;
+
+  document.getElementById('p-win').textContent = '$' + toWin.toFixed(2);
+  document.getElementById('p-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('p-implied').textContent = prob.toFixed(1) + '%';
+  document.getElementById('payResult').classList.add('show');
+}
+
+// ═══════════════════════════════════
+// EXPECTED VALUE
+// ═══════════════════════════════════
+function calcEV() {
+  const bookOdds = parseFloat(document.getElementById('evBook').value);
+  const book2 = parseFloat(document.getElementById('evBook2').value);
+  const book3 = parseFloat(document.getElementById('evBook3').value);
+  const book4 = parseFloat(document.getElementById('evBook4').value);
+  const wager = parseFloat(document.getElementById('evWager').value);
+  const unitSize = parseFloat(document.getElementById('evUnit').value) || 20;
+
+  if (isNaN(bookOdds) || isNaN(wager)) return;
+
+  // Collect all valid comparison book odds to derive no-vig true probability
+  const compBooks = [book2, book3, book4].filter(v => !isNaN(v));
+
+  let winProb;
+  if (compBooks.length === 0) {
+    // Fallback: use implied prob of main book (no devig)
+    winProb = impliedProb(bookOdds);
+  } else {
+    // Average the implied probs from comparison books, then normalize to remove vig
+    // For each side we only have one side's odds, so we use the average implied prob
+    // as a best estimate of true probability (simple consensus no-vig)
+    const allOdds = [bookOdds, ...compBooks];
+    const sumProbs = allOdds.reduce((s, o) => s + impliedProb(o), 0);
+    // No-vig: normalize so probabilities sum to 1 (remove the overround)
+    // We treat all entered odds as the SAME side, so avg implied prob is our estimate
+    const avgImplied = allOdds.reduce((s, o) => s + impliedProb(o), 0) / allOdds.length;
+    // Devig by comparing to fair 50/50 baseline — use Pinnacle-style: 
+    // true_prob = implied_prob / sum_of_all_implied (but we only have one side)
+    // Best simple approach: average of all books' implied probs, then devig
+    // using the overround implied by comparison books
+    const compImplied = compBooks.map(o => impliedProb(o));
+    const compAvg = compImplied.reduce((s, p) => s + p, 0) / compImplied.length;
+    // Assume the other side's implied prob ≈ 1 - compAvg (rough fair line)
+    // Overround ≈ compAvg + (1-compAvg) with vig baked in
+    // Simple devig: assume vig is symmetric, so true prob ≈ avg implied prob normalized
+    winProb = avgImplied; // consensus best estimate
+  }
+
+  const dec = americanToDecimal(bookOdds);
+  const toWin = (dec - 1) * wager;
+  const loseProb = 1 - winProb;
+
+  const ev = (winProb * toWin) - (loseProb * wager);
+  const evPer100 = (ev / wager) * 100;
+
+  // Quarter Kelly on unit size
+  const b = dec - 1;
+  const kellyFull = (b * winProb - loseProb) / b;
+  const quarterKelly = Math.max(0, kellyFull * 0.25);
+  const kellyUnits = quarterKelly / (unitSize / (unitSize * 10)); // in dollar terms relative to unit
+  // Express as number of units
+  const kellyBet = quarterKelly * unitSize * 10; // treat unit as ~1% of 10x unit bankroll
+  // Simpler: recommend bet = quarterKelly * (unitSize * 50) as a reasonable bankroll proxy
+  const impliedBankroll = unitSize * 50;
+  const kellyDollars = Math.max(0, quarterKelly * impliedBankroll);
+  const kellyUnitsCount = kellyDollars / unitSize;
+
+  const evEl = document.getElementById('ev-val');
+  const per100El = document.getElementById('ev-per100');
+  const verdictEl = document.getElementById('ev-verdict');
+  const fillEl = document.getElementById('ev-fill');
+  const trueProbEl = document.getElementById('ev-trueprob');
+  const kellyEl = document.getElementById('ev-kelly');
+
+  trueProbEl.textContent = (winProb * 100).toFixed(2) + '%';
+  evEl.textContent = (ev >= 0 ? '+' : '') + '$' + ev.toFixed(2);
+  per100El.textContent = (evPer100 >= 0 ? '+' : '') + '$' + evPer100.toFixed(2);
+
+  evEl.className = 'val ' + (ev >= 0 ? 'pos' : 'neg');
+  per100El.className = 'val ' + (ev >= 0 ? 'pos' : 'neg');
+
+  if (ev > 0) {
+    verdictEl.textContent = '+EV — This bet has edge';
+    verdictEl.className = 'val pos';
+    const fillPct = Math.min(Math.abs(evPer100) * 2, 100);
+    fillEl.style.width = fillPct + '%';
+    fillEl.style.background = 'var(--win)';
+    kellyEl.textContent = '$' + kellyDollars.toFixed(2) + ' (' + kellyUnitsCount.toFixed(2) + ' units)';
+  } else {
+    verdictEl.textContent = '-EV — Book has the edge';
+    verdictEl.className = 'val neg';
+    const fillPct = Math.min(Math.abs(evPer100) * 2, 100);
+    fillEl.style.width = fillPct + '%';
+    fillEl.style.background = 'var(--loss)';
+    kellyEl.textContent = 'No bet — negative EV';
+    kellyEl.className = 'val neg';
+  }
+
+  document.getElementById('evResult').classList.add('show');
+}
+
+// ═══════════════════════════════════
+// PARLAY CALCULATOR
+// ═══════════════════════════════════
+function calcParlay() {
+  const lines = document.getElementById('parlayLegs').value.trim().split('\n');
+  const wager = parseFloat(document.getElementById('parlayWager').value);
+
+  const odds = lines.map(l => parseFloat(l.trim())).filter(n => !isNaN(n));
+  if (odds.length < 2 || isNaN(wager)) return;
+
+  let combinedDec = 1;
+  let trueProb = 1;
+
+  odds.forEach(o => {
+    combinedDec *= americanToDecimal(o);
+    trueProb *= impliedProb(o);
+  });
+
+  const toWin = (combinedDec - 1) * wager;
+  const total = combinedDec * wager;
+
+  document.getElementById('pl-american').textContent = decimalToAmerican(combinedDec);
+  document.getElementById('pl-dec').textContent = combinedDec.toFixed(3) + 'x';
+  document.getElementById('pl-win').textContent = '$' + toWin.toFixed(2);
+  document.getElementById('pl-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('pl-prob').textContent = (trueProb * 100).toFixed(2) + '%';
+  document.getElementById('parlayResult').classList.add('show');
+}
+
+// ═══════════════════════════════════
+// BET TRACKER
+// ═══════════════════════════════════
+function addBet() {
+  const desc = document.getElementById('bet-desc').value.trim();
+  const odds = parseFloat(document.getElementById('bet-odds').value);
+  const wager = parseFloat(document.getElementById('bet-wager').value);
+  const book = document.getElementById('bet-book').value.trim() || '—';
+  const tag = document.getElementById('bet-tag').value.trim() || 'Untagged';
+  const result = document.getElementById('bet-result').value;
+
+  if (!desc || isNaN(odds) || isNaN(wager)) return;
+
+  const dec = americanToDecimal(odds);
+  const toWin = (dec - 1) * wager;
+
+  let pnl = 0;
+  if (result === 'win') pnl = toWin;
+  else if (result === 'loss') pnl = -wager;
+  else if (result === 'push') pnl = 0;
+  else pnl = null;
+
+  bets.unshift({ desc, odds, wager, toWin, result, pnl, book, tag, id: Date.now() });
+  renderBets();
+  updateStats();
+  renderTagChart();
+
+  document.getElementById('bet-desc').value = '';
+  document.getElementById('bet-odds').value = '';
+  document.getElementById('bet-wager').value = '';
+  document.getElementById('bet-book').value = '';
+  document.getElementById('bet-tag').value = '';
+  document.getElementById('bet-result').value = 'pending';
+}
+
+function deleteBet(id) {
+  bets = bets.filter(b => b.id !== id);
+  renderBets();
+  updateStats();
+  renderTagChart();
+}
+
+function updateResult(id, newResult) {
+  const bet = bets.find(b => b.id === id);
+  if (!bet) return;
+  bet.result = newResult;
+  if (newResult === 'win') bet.pnl = bet.toWin;
+  else if (newResult === 'loss') bet.pnl = -bet.wager;
+  else if (newResult === 'push') bet.pnl = 0;
+  else bet.pnl = null;
+  renderBets();
+  updateStats();
+  renderTagChart();
+}
+
+function renderBets() {
+  const tbody = document.getElementById('bets-body');
+  if (bets.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state">No bets logged yet. Add one above.</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = bets.map(b => {
+    const oddsStr = b.odds > 0 ? '+' + b.odds : b.odds;
+    const pnlStr = b.pnl === null ? '—' : (b.pnl >= 0 ? '+$' : '-$') + Math.abs(b.pnl).toFixed(2);
+    const pnlClass = b.pnl === null ? '' : (b.pnl > 0 ? 'pos' : b.pnl < 0 ? 'neg' : '');
+
+    return `<tr class="animate-in">
+      <td>${b.desc}</td>
+      <td style="font-family:'DM Mono',monospace">${oddsStr}</td>
+      <td>$${b.wager.toFixed(2)}</td>
+      <td style="color:var(--accent2)">$${b.toWin.toFixed(2)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">${b.book}</td>
+      <td><span style="background:rgba(53,241,200,0.1);color:var(--accent2);padding:2px 8px;border-radius:2px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.06em;">${b.tag}</span></td>
+      <td>
+        <select onchange="updateResult(${b.id}, this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:3px 6px;font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.06em;color:var(--text);cursor:pointer;outline:none;">
+          <option value="pending" ${b.result==='pending'?'selected':''}>PENDING</option>
+          <option value="win" ${b.result==='win'?'selected':''}>WIN</option>
+          <option value="loss" ${b.result==='loss'?'selected':''}>LOSS</option>
+          <option value="push" ${b.result==='push'?'selected':''}>PUSH</option>
+        </select>
+      </td>
+      <td style="font-family:'DM Mono',monospace" class="${pnlClass}">${pnlStr}</td>
+      <td><button class="del-btn" onclick="deleteBet(${b.id})">Remove</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  const settled = bets.filter(b => b.result !== 'pending');
+  const won = bets.filter(b => b.result === 'win');
+  const lost = bets.filter(b => b.result === 'loss');
+
+  const totalWagered = bets.reduce((s, b) => s + b.wager, 0);
+  const totalPnL = settled.reduce((s, b) => s + b.pnl, 0);
+  const winRate = settled.length > 0 ? (won.length / (won.length + lost.length)) * 100 : null;
+  const roi = totalWagered > 0 ? (totalPnL / totalWagered) * 100 : null;
+
+  document.getElementById('st-wagered').textContent = '$' + totalWagered.toFixed(2);
+
+  const pnlEl = document.getElementById('st-pnl');
+  pnlEl.textContent = (totalPnL >= 0 ? '+$' : '-$') + Math.abs(totalPnL).toFixed(2);
+  pnlEl.className = 'stat-value ' + (totalPnL > 0 ? 'pos' : totalPnL < 0 ? 'neg' : 'neutral');
+
+  document.getElementById('st-winrate').textContent = winRate !== null ? winRate.toFixed(1) + '%' : '—';
+
+  const roiEl = document.getElementById('st-roi');
+  roiEl.textContent = roi !== null ? (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%' : '—';
+  roiEl.className = 'stat-value ' + (roi > 0 ? 'pos' : roi < 0 ? 'neg' : 'neutral');
+}
+
+function renderTagChart() {
+  const settled = bets.filter(b => b.result !== 'pending' && b.pnl !== null);
+  const section = document.getElementById('tag-chart-section');
+
+  if (settled.length === 0) { section.style.display = 'none'; return; }
+
+  // Group by tag
+  const tagMap = {};
+  settled.forEach(b => {
+    if (!tagMap[b.tag]) tagMap[b.tag] = { pnl: 0, wagered: 0, wins: 0, losses: 0, count: 0 };
+    tagMap[b.tag].pnl += b.pnl;
+    tagMap[b.tag].wagered += b.wager;
+    if (b.result === 'win') tagMap[b.tag].wins++;
+    if (b.result === 'loss') tagMap[b.tag].losses++;
+    tagMap[b.tag].count++;
+  });
+
+  const tags = Object.entries(tagMap).sort((a, b) => b[1].pnl - a[1].pnl);
+  const maxAbs = Math.max(...tags.map(([, v]) => Math.abs(v.pnl)), 1);
+
+  const container = document.getElementById('tag-chart-bars');
+  container.innerHTML = tags.map(([tag, data]) => {
+    const roi = data.wagered > 0 ? ((data.pnl / data.wagered) * 100).toFixed(1) : '0.0';
+    const wr = (data.wins + data.losses) > 0 ? ((data.wins / (data.wins + data.losses)) * 100).toFixed(0) : '—';
+    const barPct = (Math.abs(data.pnl) / maxAbs) * 100;
+    const isPos = data.pnl >= 0;
+    const pnlStr = (isPos ? '+$' : '-$') + Math.abs(data.pnl).toFixed(2);
+    const color = isPos ? 'var(--win)' : 'var(--loss)';
+
+    return `<div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--text)">${tag}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">${data.count} bets · ${wr}% W · ROI ${roi}%</span>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:0.9rem;font-weight:500;color:${color}">${pnlStr}</span>
+      </div>
+      <div style="height:10px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${barPct}%;background:${color};border-radius:3px;transition:width 0.5s ease;opacity:0.85;"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  section.style.display = 'block';
+}
+
+// ═══════════════════════════════════
+// KELLY CRITERION
+// ═══════════════════════════════════
+function calcKelly() {
+  const bankroll = parseFloat(document.getElementById('k-bankroll').value);
+  const odds = parseFloat(document.getElementById('k-odds').value);
+  const fraction = parseFloat(document.getElementById('k-fraction').value);
+  const book2 = parseFloat(document.getElementById('k-book2').value);
+  const book3 = parseFloat(document.getElementById('k-book3').value);
+  const book4 = parseFloat(document.getElementById('k-book4').value);
+
+  if (isNaN(bankroll) || isNaN(odds)) return;
+
+  // Derive true probability from comparison books (same logic as EV calc)
+  const compBooks = [book2, book3, book4].filter(v => !isNaN(v));
+  let winProb;
+  if (compBooks.length === 0) {
+    winProb = impliedProb(odds);
+  } else {
+    const allOdds = [odds, ...compBooks];
+    winProb = allOdds.reduce((s, o) => s + impliedProb(o), 0) / allOdds.length;
+  }
+
+  const dec = americanToDecimal(odds);
+  const b = dec - 1;
+  const q = 1 - winProb;
+
+  const kelly = (b * winProb - q) / b;
+  const adjustedKelly = Math.max(0, kelly * fraction);
+  const betAmount = adjustedKelly * bankroll;
+  const pct = adjustedKelly * 100;
+
+  document.getElementById('k-trueprob-line').textContent = 'True prob (consensus): ' + (winProb * 100).toFixed(2) + '%';
+  document.getElementById('k-amount').textContent = '$' + betAmount.toFixed(2);
+  document.getElementById('k-pct').textContent = pct.toFixed(2) + '% of bankroll';
+
+  const fill = document.getElementById('k-risk-fill');
+  const riskLabel = document.getElementById('k-risk-label');
+  const riskPct = Math.min(pct * 4, 100);
+  fill.style.width = riskPct + '%';
+
+  if (kelly <= 0) {
+    fill.style.background = 'var(--loss)'; riskLabel.textContent = 'No Edge — Don\'t Bet';
+  } else if (pct < 3) { fill.style.background = 'var(--win)'; riskLabel.textContent = 'Low'; }
+  else if (pct < 7) { fill.style.background = 'var(--push)'; riskLabel.textContent = 'Medium'; }
+  else { fill.style.background = 'var(--loss)'; riskLabel.textContent = 'High'; }
+
+  document.getElementById('kellyResult').classList.add('show');
+}
+
+// ═══════════════════════════════════
+// BREAK-EVEN
+// ═══════════════════════════════════
+function calcBreakEven() {
+  const odds = parseFloat(document.getElementById('be-odds').value);
+  if (isNaN(odds)) return;
+
+  const prob = impliedProb(odds) * 100;
+  const fairProb = 50; // assume fair market is 50/50 for simplicity
+  const vig = prob - 47.62; // vs true 50/50 at -110 as baseline
+
+  document.getElementById('be-pct').textContent = prob.toFixed(2) + '%';
+  document.getElementById('be-vig').textContent = '+' + Math.max(0, prob - (100 / americanToDecimal(odds) * 1)).toFixed(2) + '% to house';
+  document.getElementById('be-need').textContent = prob.toFixed(2) + '% of bets';
+  document.getElementById('beResult').classList.add('show');
+}
+
+// ═══════════════════════════════════
+// QUICK REFERENCE TABLE
+// ═══════════════════════════════════
+function buildQuickRef() {
+  const lines = [-110, -105, -115, -120, +100, +110, +120, +150];
+  const el = document.getElementById('quick-ref');
+  el.innerHTML = lines.map(o => {
+    const prob = (impliedProb(o) * 100).toFixed(1);
+    const dec = americanToDecimal(o).toFixed(3);
+    const sign = o > 0 ? '+' : '';
+    return `<div class="result-row">
+      <span class="key" style="font-family:'DM Mono',monospace">${sign}${o}</span>
+      <span style="font-size:0.78rem;color:var(--muted)">${dec}x decimal</span>
+      <span class="val neutral" style="font-size:0.8rem">${prob}% break-even</span>
+    </div>`;
+  }).join('');
+}
+
+buildQuickRef();
+
+// ══════════════════════════════════════════════
+// SAVE / LOAD
+// ══════════════════════════════════════════════
+function exportData() {
+  if (!bets.length) {
+    showToast('No bets to save yet — add some bets first.');
+    return;
+  }
+  const state = {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    bets
+  };
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `the-edge-bets-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Bets saved!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const state = JSON.parse(e.target.result);
+      if (!Array.isArray(state.bets)) throw new Error('Invalid file');
+      bets = state.bets;
+      renderBets();
+      renderTagChart();
+      const saved = state.savedAt ? new Date(state.savedAt).toLocaleString() : 'unknown';
+      showToast(`✓ ${bets.length} bets loaded — saved ${saved}`);
+    } catch(err) {
+      showToast('Error: not a valid Edge save file.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function showToast(msg) {
+  // reuse existing toast if present, else create one
+  let t = document.getElementById('edge-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'edge-toast';
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);color:var(--text);padding:10px 18px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.06em;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:10000;opacity:0;transform:translateY(8px);transition:all 0.2s;`;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(8px)'; }, 2800);
+}
+</script>
+</body>
+</html>
